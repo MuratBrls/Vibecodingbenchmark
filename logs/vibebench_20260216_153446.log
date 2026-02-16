@@ -1,0 +1,16 @@
+[15:34:46] INFO     vibebench.logger          │ VibeBench logging başlatıldı — C:\Users\egule\Desktop\antigravity\Vibecoding Benchmark\logs\vibebench_20260216_153446.log
+[15:34:46] INFO     vibebench.main            │ Benchmark v1.1 başlatıldı — prompt: Gelişmiş ve Nesne Yönelimli (OOP) bir hesap makinesi yaz
+[15:34:46] INFO     vibebench.distributor     │ Antigravity: task_input.txt dağıtıldı
+[15:34:46] INFO     vibebench.distributor     │ Cursor: task_input.txt dağıtıldı
+[15:34:46] INFO     vibebench.distributor     │ Windsurf: task_input.txt dağıtıldı
+[15:34:46] INFO     vibebench.watcher         │ Antigravity: gözlemci başlatıldı — C:\Users\egule\Desktop\antigravity\Vibecoding Benchmark\test-benchantigravity
+[15:34:46] INFO     vibebench.watcher         │ Cursor: gözlemci başlatıldı — C:\Users\egule\Desktop\antigravity\Vibecoding Benchmark\test-benchcursor
+[15:34:46] INFO     vibebench.watcher         │ Windsurf: gözlemci başlatıldı — C:\Users\egule\Desktop\antigravity\Vibecoding Benchmark\test-benchwindsurf
+[15:36:20] INFO     vibebench.watcher         │ Antigravity: 🟢 start_signal.json alındı — kronometre başladı
+[15:36:29] INFO     vibebench.watcher         │ Windsurf: 🟢 start_signal.json alındı — kronometre başladı
+[15:36:53] INFO     vibebench.watcher         │ Windsurf: ✅ tamamlandı — calculator.py (net: 24.216s)
+[15:37:03] INFO     vibebench.watcher         │ Antigravity: ✅ tamamlandı — calculator.py (net: 42.761s)
+[15:37:52] INFO     vibebench.watcher         │ Cursor: 🟢 start_signal.json alındı — kronometre başladı
+[15:38:21] INFO     vibebench.watcher         │ Cursor: ✅ tamamlandı — calculator.py (net: 29.169s)
+[15:38:52] ERROR    vibebench.logger          │ Rapor kaydetme hatası: 'lines_score'
+[15:38:52] INFO     vibebench.main            │ 🏆 KAZANAN: Windsurf (skor: 67.2, net süre: 24.216s)

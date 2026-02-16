@@ -1,0 +1,11 @@
+{
+  "status": "completed",
+  "signal_time": 1771245380.7764149,
+  "end_time": 1771245423.537877,
+  "net_execution_time": 42.761,
+  "gross_time": 136.947,
+  "tool": "Antigravity",
+  "detected_files": [
+    "calculator.py"
+  ]
+}

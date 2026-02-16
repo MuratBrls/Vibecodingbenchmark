@@ -1,0 +1,11 @@
+{
+  "status": "completed",
+  "signal_time": 1771245389.0749757,
+  "end_time": 1771245413.2905033,
+  "net_execution_time": 24.216,
+  "gross_time": 126.7,
+  "tool": "Windsurf",
+  "detected_files": [
+    "calculator.py"
+  ]
+}

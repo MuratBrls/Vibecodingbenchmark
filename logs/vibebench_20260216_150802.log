@@ -1,0 +1,11 @@
+[15:08:02] INFO     vibebench.logger          │ VibeBench logging başlatıldı — C:\Users\egule\Desktop\antigravity\Vibecoding Benchmark\logs\vibebench_20260216_150802.log
+[15:08:02] INFO     vibebench.main            │ Benchmark başlatıldı — prompt: Basit bir hesap makinesi yaz
+[15:08:02] INFO     vibebench.distributor     │ Antigravity: task_input.txt dağıtıldı
+[15:08:02] INFO     vibebench.distributor     │ Cursor: task_input.txt dağıtıldı
+[15:08:02] INFO     vibebench.distributor     │ Swift: task_input.txt dağıtıldı
+[15:08:02] INFO     vibebench.watcher         │ Antigravity: gözlemci başlatıldı — C:\Users\egule\Desktop\antigravity\Vibecoding Benchmark\test-benchantigravity
+[15:08:02] INFO     vibebench.watcher         │ Cursor: gözlemci başlatıldı — C:\Users\egule\Desktop\antigravity\Vibecoding Benchmark\test-benchcursor
+[15:08:02] INFO     vibebench.watcher         │ Swift: gözlemci başlatıldı — C:\Users\egule\Desktop\antigravity\Vibecoding Benchmark\test-benchswift
+[15:09:59] INFO     vibebench.watcher         │ Antigravity: ilk dosya yakalandı — hesap_makinesi.py (117.353s)
+[15:18:02] INFO     vibebench.logger          │ Final rapor kaydedildi: C:\Users\egule\Desktop\antigravity\Vibecoding Benchmark\logs\report_20260216_151802.json
+[15:18:02] INFO     vibebench.main            │ 🏆 KAZANAN: Antigravity (skor: 70.0, süre: 117.353s)
