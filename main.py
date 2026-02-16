@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-dfdfdfdf
 VibeBench — Main CLI v1.1
 Signal Trigger protokolü ile modülleri orkestre eder.
 """
