@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-VibeBench — Main CLI v1.1
-Signal Trigger protokolü ile modülleri orkestre eder.
+Black Box Deep Analytics — Main CLI v2.0
+Signal Trigger + Telemetri + Derin Analiz ile modülleri orkestre eder.
 """
 
 import argparse
@@ -15,11 +15,13 @@ from rich.panel import Panel
 from rich.text import Text
 from rich.live import Live
 
-from config import WATCH_TIMEOUT, TARGETS, STATUS_FILE, LOGS_DIR, START_SIGNAL_FILE
+from config import WATCH_TIMEOUT, TARGETS, STATUS_FILE, LOGS_DIR, START_SIGNAL_FILE, VERSION, APP_NAME
 from distributor import distribute_prompt
 from watcher import BenchmarkWatcher
 from scorer import calculate_scores, get_winner
 from bench_logger import setup_logging, save_final_report
+from pre_check import run_pre_checks
+from html_report import generate_html_report
 from dashboard import (
     build_live_table,
     print_final,
@@ -35,7 +37,7 @@ logger = logging.getLogger("vibebench.main")
 # ═══════════════════════════════════════════════════════════════════
 
 def cmd_run(args):
-    """Benchmark: dağıt → izle (signal trigger) → skorla → raporla."""
+    """Benchmark: pre-check → dağıt → izle (signal trigger + telemetri) → skorla → raporla."""
 
     prompt_text = args.prompt
     no_clean    = args.no_clean
@@ -44,7 +46,59 @@ def cmd_run(args):
     # ── 0. LOGGING ──────────────────────────────────────────────
     log_file = setup_logging()
     print_banner()
-    logger.info("Benchmark v1.1 başlatıldı — prompt: %s", prompt_text[:100])
+    logger.info("%s v%s başlatıldı — prompt: %s", APP_NAME, VERSION, prompt_text[:100])
+
+    # ── 0.1 KULLANICI REHBERİ ──────────────────────────────────
+    console.print(Panel(
+        "[bold bright_yellow]🎯 HOŞ GELDİN![/]\n\n"
+        "Black Box Deep Analytics sistemi şu an AI araçlarını izlemeye hazır.\n"
+        "Benchmark başarılı olması için AI araçlarının (Antigravity, Cursor, Windsurf)\n"
+        "protokolü takip etmesi gerekiyor.\n\n"
+        "[bold bright_cyan]📋 AI'LARA VERİLECEK KOMUT:[/]\n"
+        "[dim]═══════════════════════════════════════════════════════════════════[/]\n"
+        '[bright_white]"Önce \'start_signal.json\' oluştur, sonra OOP yapısında\n'
+        '\'calculator.py\' yaz, bitince \'start_signal.json\' dosyasını sil.\n'
+        'Hızlı ol, telemetri seni izliyor!"[/]\n'
+        "[dim]═══════════════════════════════════════════════════════════════════[/]\n\n"
+        "[bold bright_green]✅ PROTOKOL ADIMLARI:[/]\n"
+        "  [bright_cyan]1.[/] [bold]start_signal.json[/] oluştur → ⏱️ kronometre başlar\n"
+        "  [bright_cyan]2.[/] Kodu yaz ve kaydet → ⏱️ kronometre durur\n"
+        "  [bright_cyan]3.[/] [bold]start_signal.json[/] sil → ✅ protokol tamamlandı\n\n"
+        "[bold bright_magenta]📊 PUANLAMA SİSTEMİ:[/]\n"
+        "  • ⏱️  30% Net Hız\n"
+        "  • 🏛️  30% Mimari & Temiz Kod (McCabe + PEP8 + Güvenlik)\n"
+        "  • ❌ 25% Hata/Deneme Oranı\n"
+        "  • 💎 15% Kütüphane Verimliliği\n\n"
+        f"[bold bright_blue]📁 RAPORLAR:[/] [dim]{LOGS_DIR}/[/]\n"
+        "  • JSON: report_YYYYMMDD_HHMMSS.json\n"
+        "  • HTML: report_YYYYMMDD_HHMMSS.html (tarayıcıda açılabilir)\n\n"
+        "[dim italic]💡 İpucu: Süre AI signal dosyası oluşturduğunda başlar,\n"
+        "   kod dosyası kaydettiğinde durur. İnsan bekleme süresi sayılmaz![/]",
+        title=f"[bold]⚡ {APP_NAME} v{VERSION} — Kullanım Rehberi[/]",
+        border_style="bright_green",
+        padding=(1, 2),
+    ))
+    console.print()
+
+
+    # ── 0.5 PRE-CHECK ──────────────────────────────────────────
+    console.print(Panel(
+        "🔍 Hedef klasör izinleri denetleniyor...",
+        title="[bold]0 · Ön Kontrol[/]",
+        border_style="bright_blue",
+    ))
+
+    check_result = run_pre_checks()
+    for tool_name, info in check_result["results"].items():
+        if info["ok"]:
+            console.print(f"  ✅ [bright_green]{tool_name}[/] — yazma izni OK")
+        else:
+            console.print(f"  ❌ [bright_red]{tool_name}[/] — {info['error']}")
+
+    if not check_result["all_ok"]:
+        console.print("\n[bright_red]⛔ Klasör izin hatası! Lütfen izinleri kontrol edin.[/]")
+        sys.exit(1)
+    console.print()
 
     # ── 1. DAĞITIM ──────────────────────────────────────────────
     console.print(Panel(
@@ -54,6 +108,11 @@ def cmd_run(args):
     ))
 
     dist_results = distribute_prompt(prompt_text, clean=not no_clean)
+
+    if not dist_results:
+        console.print("[bright_red]⛔ Hedef bulunamadı![/]")
+        sys.exit(1)
+
     start_time = list(dist_results.values())[0]["start_time"]
 
     all_ok = True
@@ -70,16 +129,17 @@ def cmd_run(args):
 
     console.print()
 
-    # ── 2. SIGNAL TRIGGER BİLGİ ────────────────────────────────
+    # ── 2. SIGNAL TRIGGER + TELEMETRİ BİLGİ ────────────────────
     console.print(Panel(
-        "👁️  Dosya izleme başlatılıyor...\n\n"
+        "👁️  Dosya izleme + telemetri başlatılıyor...\n\n"
         "   📋 [bold]AI Görev Protokolü:[/]\n"
         f"   [bright_cyan]1.[/] Klasöre [bold]{START_SIGNAL_FILE}[/] oluştur → kronometre başlar\n"
         "   [bright_cyan]2.[/] Kodu yaz ve klasöre kaydet → kronometre durur\n"
         f"   [bright_cyan]3.[/] İşlem bittikten sonra [bold]{START_SIGNAL_FILE}[/] sil\n\n"
         f"   ⏰ Timeout: {timeout}sn\n"
-        "   📊 Puanlama: 35% Hız + 25% Validasyon + 25% Mimari + 15% Kütüphane",
-        title="[bold]2 · Signal Trigger İzleme[/]",
+        "   📊 Puanlama: 30% Hız + 30% Mimari + 25% Hata/Deneme + 15% Kütüphane\n"
+        "   🔬 Derin Analiz: McCabe + PEP8 + Güvenlik Taraması",
+        title="[bold]2 · Signal Trigger + Telemetri İzleme[/]",
         border_style="bright_yellow",
     ))
     console.print()
@@ -113,17 +173,23 @@ def cmd_run(args):
         "🧮 Skorlar hesaplanıyor...\n"
         "   • Syntax & Runtime doğrulaması\n"
         "   • Mimari analizi (OOP / Functional / Scripting)\n"
-        "   • Kütüphane taraması\n"
-        "   • Karmaşıklık değerlendirmesi",
+        "   • McCabe karmaşıklığı & PEP8 uyumu\n"
+        "   • Güvenlik taraması (eval/exec)\n"
+        "   • Kütüphane verimliliği\n"
+        "   • Hata/Deneme oranı analizi",
         title="[bold]3 · Derin Analiz & Skorlama[/]",
         border_style="bright_cyan",
     ))
 
     watcher_results = watcher.get_results()
-    scores = calculate_scores(watcher_results)
+    telemetry_data = watcher.get_telemetry_data()
+    scores = calculate_scores(watcher_results, telemetry_data)
 
     # ── 6. RAPOR ────────────────────────────────────────────────
     report_path = save_final_report(scores, prompt_text, log_file)
+
+    # HTML Rapor
+    html_path = generate_html_report(scores, prompt_text, telemetry_data)
 
     winner_name, winner_data = get_winner(scores)
     if winner_name:
@@ -132,7 +198,7 @@ def cmd_run(args):
                      f"{winner_data['execution_time']:.3f}s" if winner_data["execution_time"] else "N/A")
 
     # ── 7. FİNAL ───────────────────────────────────────────────
-    print_final(scores, report_path)
+    print_final(scores, report_path, html_path)
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -152,10 +218,18 @@ def cmd_status(args):
                     data = json.load(f)
                 status = data.get("status", "unknown")
                 net = data.get("net_execution_time") or data.get("execution_time")
-                t_str = f"{net:.3f}sn" if net else "—"
+                t_str = f"{net:.3f}sn" if net is not None else "—"
                 files = ", ".join(data.get("detected_files", [])) or "—"
-                console.print(f"  🔧 [bold]{tool_name}[/]: {status} | Net süre: {t_str} | Dosyalar: {files}")
+
+                # Telemetri verileri
+                tele = data.get("telemetry", {})
+                tele_str = ""
+                if tele:
+                    tele_str = f" | Deneme: {tele.get('retries', 0)} | Hata: {tele.get('errors', 0)}"
+
+                console.print(f"  🔧 [bold]{tool_name}[/]: {status} | Net süre: {t_str} | Dosyalar: {files}{tele_str}")
             except Exception as e:
+                logger.debug("Status dosyası okuma hatası: %s", e, exc_info=True)
                 console.print(f"  🔧 [bold]{tool_name}[/]: [red]Okuma hatası: {e}[/]")
         else:
             console.print(f"  🔧 [bold]{tool_name}[/]: [dim]Henüz veri yok[/]")
@@ -170,6 +244,14 @@ def cmd_status(args):
             console.print(f"  📄 Son rapor: [dim]{os.path.join(LOGS_DIR, reports[0])}[/]")
             console.print()
 
+        html_reports = sorted(
+            [f for f in os.listdir(LOGS_DIR) if f.startswith("report_") and f.endswith(".html")],
+            reverse=True,
+        )
+        if html_reports:
+            console.print(f"  🌐 Son HTML: [dim]{os.path.join(LOGS_DIR, html_reports[0])}[/]")
+            console.print()
+
 
 # ═══════════════════════════════════════════════════════════════════
 #  CLI
@@ -178,7 +260,7 @@ def cmd_status(args):
 def main():
     parser = argparse.ArgumentParser(
         prog="vibebench",
-        description="⚡ VibeBench — Multi-AI Coding Benchmark Tool v1.1 (Signal Trigger)",
+        description=f"⚡ {APP_NAME} — Multi-AI Coding Benchmark Tool v{VERSION}",
     )
     sub = parser.add_subparsers(dest="command", help="Komutlar")
 

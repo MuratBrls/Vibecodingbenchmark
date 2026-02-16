@@ -1,331 +1,440 @@
 # -*- coding: utf-8 -*-
 """
-Advanced Calculator — OOP Architecture
-Modüler, hata toleranslı, genişletilebilir hesap makinesi.
+Gelişmiş Nesne Yönelimli (OOP) Hesap Makinesi
+Temel ve bilimsel işlemler, geçmiş kayıtları, hata yönetimi.
 """
 
 import math
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Dict, Optional
+from typing import List, Optional
+from datetime import datetime
 
-# ─── LOGGING YAPILANDIRMASI ──────────────────────────────────────
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  SOYUT TEMEL SINIF
+#  SOYUT İŞLEM SINIFI
 # ═══════════════════════════════════════════════════════════════════
 
 class Operation(ABC):
-    """Tüm işlemler için soyut temel sınıf."""
+    """Tüm matematiksel işlemler için soyut temel sınıf."""
 
-    @property
     @abstractmethod
-    def name(self) -> str:
-        ...
+    def execute(self, *args: float) -> float:
+        """İşlemi gerçekleştir."""
+        pass
 
-    @property
     @abstractmethod
     def symbol(self) -> str:
-        ...
-
-    @abstractmethod
-    def execute(self, a: float, b: float = 0) -> float:
-        ...
+        """İşlem sembolü."""
+        pass
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  SOMUT İŞLEM SINIFLARI
+#  TEMEL ARİTMETİK İŞLEMLER
 # ═══════════════════════════════════════════════════════════════════
 
 class Addition(Operation):
-    name = "Toplama"
-    symbol = "+"
-
-    def execute(self, a: float, b: float = 0) -> float:
+    def execute(self, a: float, b: float) -> float:
         return a + b
+
+    def symbol(self) -> str:
+        return "+"
 
 
 class Subtraction(Operation):
-    name = "Çıkarma"
-    symbol = "-"
-
-    def execute(self, a: float, b: float = 0) -> float:
+    def execute(self, a: float, b: float) -> float:
         return a - b
+
+    def symbol(self) -> str:
+        return "-"
 
 
 class Multiplication(Operation):
-    name = "Çarpma"
-    symbol = "×"
-
-    def execute(self, a: float, b: float = 0) -> float:
+    def execute(self, a: float, b: float) -> float:
         return a * b
+
+    def symbol(self) -> str:
+        return "×"
 
 
 class Division(Operation):
-    name = "Bölme"
-    symbol = "÷"
-
-    def execute(self, a: float, b: float = 0) -> float:
+    def execute(self, a: float, b: float) -> float:
         if b == 0:
-            raise ZeroDivisionError("Sıfıra bölme tanımsızdır!")
+            raise ZeroDivisionError("Sıfıra bölme hatası!")
         return a / b
+
+    def symbol(self) -> str:
+        return "÷"
+
+
+class Modulus(Operation):
+    def execute(self, a: float, b: float) -> float:
+        if b == 0:
+            raise ZeroDivisionError("Sıfıra mod alma hatası!")
+        return a % b
+
+    def symbol(self) -> str:
+        return "%"
 
 
 class Power(Operation):
-    name = "Üs Alma"
-    symbol = "^"
+    def execute(self, a: float, b: float) -> float:
+        return a ** b
 
-    def execute(self, a: float, b: float = 0) -> float:
-        try:
-            return a ** b
-        except OverflowError:
-            raise OverflowError(f"{a}^{b} çok büyük bir sonuç üretiyor!")
+    def symbol(self) -> str:
+        return "^"
 
+
+# ═══════════════════════════════════════════════════════════════════
+#  BİLİMSEL İŞLEMLER (Tek Operand)
+# ═══════════════════════════════════════════════════════════════════
 
 class SquareRoot(Operation):
-    name = "Karekök"
-    symbol = "√"
-
-    def execute(self, a: float, b: float = 0) -> float:
+    def execute(self, a: float) -> float:
         if a < 0:
             raise ValueError("Negatif sayının karekökü alınamaz!")
         return math.sqrt(a)
 
+    def symbol(self) -> str:
+        return "√"
 
-class Modulus(Operation):
-    name = "Mod Alma"
-    symbol = "%"
 
-    def execute(self, a: float, b: float = 0) -> float:
-        if b == 0:
-            raise ZeroDivisionError("Sıfıra mod alma tanımsızdır!")
-        return a % b
+class Logarithm(Operation):
+    def execute(self, a: float) -> float:
+        if a <= 0:
+            raise ValueError("0 veya negatif sayının logaritması alınamaz!")
+        return math.log10(a)
+
+    def symbol(self) -> str:
+        return "log₁₀"
+
+
+class NaturalLog(Operation):
+    def execute(self, a: float) -> float:
+        if a <= 0:
+            raise ValueError("0 veya negatif sayının doğal logaritması alınamaz!")
+        return math.log(a)
+
+    def symbol(self) -> str:
+        return "ln"
+
+
+class Sine(Operation):
+    def execute(self, a: float) -> float:
+        return math.sin(math.radians(a))
+
+    def symbol(self) -> str:
+        return "sin"
+
+
+class Cosine(Operation):
+    def execute(self, a: float) -> float:
+        return math.cos(math.radians(a))
+
+    def symbol(self) -> str:
+        return "cos"
+
+
+class Tangent(Operation):
+    def execute(self, a: float) -> float:
+        return math.tan(math.radians(a))
+
+    def symbol(self) -> str:
+        return "tan"
+
+
+class Factorial(Operation):
+    def execute(self, a: float) -> float:
+        if a < 0 or a != int(a):
+            raise ValueError("Faktöriyel yalnızca pozitif tam sayılar için tanımlıdır!")
+        return float(math.factorial(int(a)))
+
+    def symbol(self) -> str:
+        return "!"
 
 
 # ═══════════════════════════════════════════════════════════════════
 #  İŞLEM GEÇMİŞİ
 # ═══════════════════════════════════════════════════════════════════
 
-class HistoryEntry:
+class HistoryRecord:
     """Tek bir işlem kaydı."""
 
-    __slots__ = ("operation", "a", "b", "result")
-
-    def __init__(self, operation: str, a: float, b: float, result: float):
-        self.operation = operation
-        self.a = a
-        self.b = b
+    def __init__(self, expression: str, result: float):
+        self.expression = expression
         self.result = result
+        self.timestamp = datetime.now()
 
-    def __repr__(self) -> str:
-        return f"{self.operation}: {self.a}, {self.b} = {self.result}"
+    def __str__(self) -> str:
+        return f"[{self.timestamp.strftime('%H:%M:%S')}] {self.expression} = {self.result}"
 
 
-class History:
-    """İşlem geçmişi yöneticisi."""
+class HistoryManager:
+    """İşlem geçmişini yönetir."""
 
-    def __init__(self, max_size: int = 50):
-        self._entries: List[HistoryEntry] = []
-        self._max_size = max_size
+    def __init__(self, max_records: int = 100):
+        self._records: List[HistoryRecord] = []
+        self._max_records = max_records
 
-    def add(self, operation: str, a: float, b: float, result: float):
-        entry = HistoryEntry(operation, a, b, result)
-        self._entries.append(entry)
-        if len(self._entries) > self._max_size:
-            self._entries.pop(0)
-        logger.debug("Geçmişe eklendi: %s", entry)
+    def add(self, expression: str, result: float) -> None:
+        record = HistoryRecord(expression, result)
+        self._records.append(record)
+        if len(self._records) > self._max_records:
+            self._records.pop(0)
+        logger.debug("Geçmişe eklendi: %s", record)
 
-    def get_all(self) -> List[HistoryEntry]:
-        return self._entries.copy()
+    def get_all(self) -> List[HistoryRecord]:
+        return list(self._records)
 
-    def clear(self):
-        self._entries.clear()
+    def get_last(self, n: int = 5) -> List[HistoryRecord]:
+        return self._records[-n:]
+
+    def clear(self) -> None:
+        self._records.clear()
         logger.info("Geçmiş temizlendi.")
 
     @property
     def count(self) -> int:
-        return len(self._entries)
-
-    @property
-    def last(self) -> Optional[HistoryEntry]:
-        return self._entries[-1] if self._entries else None
+        return len(self._records)
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  ANA HESAP MAKİNESİ SINIFI
+#  BELLEK YÖNETİCİSİ
+# ═══════════════════════════════════════════════════════════════════
+
+class MemoryManager:
+    """Hesap makinesi bellek işlemleri (M+, M-, MR, MC)."""
+
+    def __init__(self):
+        self._value: float = 0.0
+
+    def add(self, value: float) -> None:
+        self._value += value
+
+    def subtract(self, value: float) -> None:
+        self._value -= value
+
+    def recall(self) -> float:
+        return self._value
+
+    def clear(self) -> None:
+        self._value = 0.0
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  ANA HESAP MAKİNESİ
 # ═══════════════════════════════════════════════════════════════════
 
 class Calculator:
     """
-    Genişletilebilir hesap makinesi.
-    Yeni işlemler register_operation() ile eklenir.
+    Gelişmiş OOP Hesap Makinesi.
+
+    Özellikler:
+        - Temel aritmetik: +, -, ×, ÷, %, ^
+        - Bilimsel: √, log, ln, sin, cos, tan, !
+        - İşlem geçmişi (max 100 kayıt)
+        - Bellek işlemleri (M+, M-, MR, MC)
+        - Kapsamlı hata yönetimi
     """
 
+    OPERATIONS = {
+        "+": Addition(),
+        "-": Subtraction(),
+        "*": Multiplication(),
+        "/": Division(),
+        "%": Modulus(),
+        "^": Power(),
+        "sqrt": SquareRoot(),
+        "log": Logarithm(),
+        "ln": NaturalLog(),
+        "sin": Sine(),
+        "cos": Cosine(),
+        "tan": Tangent(),
+        "!": Factorial(),
+    }
+
+    SCIENTIFIC_OPS = {"sqrt", "log", "ln", "sin", "cos", "tan", "!"}
+
     def __init__(self):
-        self._operations: Dict[str, Operation] = {}
-        self._history = History()
-        self._register_defaults()
+        self.history = HistoryManager()
+        self.memory = MemoryManager()
+        self._last_result: Optional[float] = None
+        logger.info("Hesap Makinesi başlatıldı.")
 
-    def _register_defaults(self):
-        """Varsayılan işlemleri kaydeder."""
-        defaults = [
-            Addition(), Subtraction(), Multiplication(),
-            Division(), Power(), SquareRoot(), Modulus(),
-        ]
-        for op in defaults:
-            self._operations[op.name] = op
+    def calculate(self, op_key: str, a: float, b: float = 0.0) -> float:
+        """
+        İşlem gerçekleştir.
 
-    def register_operation(self, operation: Operation):
-        """Yeni bir işlem türü kaydeder."""
-        self._operations[operation.name] = operation
-        logger.info("Yeni işlem kaydedildi: %s", operation.name)
+        Args:
+            op_key: İşlem anahtarı (+, -, *, /, sqrt, sin, vb.)
+            a: Birinci operand
+            b: İkinci operand (bilimsel işlemlerde kullanılmaz)
 
-    def calculate(self, op_name: str, a: float, b: float = 0) -> float:
-        """İşlemi çalıştırır, geçmişe kaydeder."""
-        if op_name not in self._operations:
-            raise KeyError(f"Bilinmeyen işlem: {op_name}")
+        Returns:
+            İşlem sonucu
 
-        op = self._operations[op_name]
-        try:
-            result = op.execute(a, b)
-            self._history.add(op_name, a, b, result)
-            return result
-        except (ZeroDivisionError, ValueError, OverflowError):
-            raise
-        except Exception as e:
-            logger.error("İşlem hatası (%s): %s", op_name, e)
-            raise
+        Raises:
+            ValueError: Geçersiz işlem veya parametre
+            ZeroDivisionError: Sıfıra bölme
+        """
+        operation = self.OPERATIONS.get(op_key)
+        if operation is None:
+            raise ValueError(f"Bilinmeyen işlem: '{op_key}'")
+
+        if op_key in self.SCIENTIFIC_OPS:
+            result = operation.execute(a)
+            expression = f"{operation.symbol()}({a})"
+        else:
+            result = operation.execute(a, b)
+            expression = f"{a} {operation.symbol()} {b}"
+
+        # Sonucu yuvarla
+        result = round(result, 10)
+        self._last_result = result
+
+        # Geçmişe ekle
+        self.history.add(expression, result)
+
+        return result
 
     @property
-    def operations(self) -> Dict[str, Operation]:
-        return self._operations.copy()
+    def last_result(self) -> Optional[float]:
+        return self._last_result
 
-    @property
-    def history(self) -> History:
-        return self._history
+    def show_operations(self) -> None:
+        """Mevcut işlemleri listele."""
+        print("\n📋 Kullanılabilir İşlemler:")
+        print("─" * 40)
+        print("  Temel:    +  -  *  /  %  ^")
+        print("  Bilimsel: sqrt  log  ln  sin  cos  tan  !")
+        print("  Bellek:   M+  M-  MR  MC")
+        print("  Diğer:    history  clear  quit")
+        print("─" * 40)
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  KULLANICİ ARAYÜZÜ
+#  KONSOl ARAYÜZÜ
 # ═══════════════════════════════════════════════════════════════════
 
-class CalculatorUI:
-    """Terminal tabanlı kullanıcı arayüzü."""
-
-    SINGLE_OPERAND_OPS = {"Karekök"}
+class ConsoleUI:
+    """Hesap makinesi konsol arayüzü."""
 
     def __init__(self):
         self.calc = Calculator()
 
-    def _print_header(self):
-        print("=" * 45)
-        print("  🧮 GELİŞMİŞ HESAP MAKİNESİ (OOP Edition)")
-        print("  📐 Mimari: Abstract Factory + Strategy")
-        print("=" * 45)
-
-    def _print_menu(self):
-        print("\n📋 İşlemler:")
-        ops = list(self.calc.operations.items())
-        for i, (name, op) in enumerate(ops, 1):
-            print(f"  {i}. {op.symbol}  {name}")
-        print(f"  {len(ops) + 1}. 📋 Geçmiş Göster")
-        print(f"  {len(ops) + 2}. 🗑️  Geçmiş Temizle")
-        print("  0. 🚪 Çıkış")
-
-    def _get_float(self, prompt: str) -> float:
-        while True:
-            try:
-                return float(input(prompt))
-            except ValueError:
-                print("❌ Geçersiz sayı! Tekrar deneyin.")
-
-    def _show_history(self):
-        entries = self.calc.history.get_all()
-        if not entries:
-            print("\n📋 Geçmiş boş.")
-            return
-        print(f"\n📋 İşlem Geçmişi ({self.calc.history.count} kayıt):")
-        print("-" * 40)
-        for i, entry in enumerate(entries, 1):
-            print(f"  {i:>3}. {entry}")
-        print("-" * 40)
-
-    def run(self):
+    def run(self) -> None:
         """Ana döngü."""
         self._print_header()
-
-        ops_list = list(self.calc.operations.keys())
-        total_options = len(ops_list)
+        self.calc.show_operations()
 
         while True:
-            self._print_menu()
-            choice = input("\n>> ").strip()
+            try:
+                user_input = input("\n🔢 İşlem: ").strip().lower()
 
-            if choice == "0":
-                print("\n👋 Güle güle!")
+                if user_input in ("quit", "exit", "q"):
+                    print("\n👋 Hesap makinesi kapatıldı. Toplam işlem: "
+                          f"{self.calc.history.count}")
+                    break
+
+                if user_input == "history":
+                    self._show_history()
+                    continue
+
+                if user_input == "clear":
+                    self.calc.history.clear()
+                    print("🗑️ Geçmiş temizlendi.")
+                    continue
+
+                if user_input == "help":
+                    self.calc.show_operations()
+                    continue
+
+                if user_input.startswith("m"):
+                    self._handle_memory(user_input)
+                    continue
+
+                self._process_calculation(user_input)
+
+            except KeyboardInterrupt:
+                print("\n\n👋 Çıkış yapıldı.")
                 break
-
-            try:
-                idx = int(choice)
-            except ValueError:
-                print("❌ Geçersiz seçim!")
-                continue
-
-            # Geçmiş göster
-            if idx == total_options + 1:
-                self._show_history()
-                continue
-
-            # Geçmiş temizle
-            if idx == total_options + 2:
-                self.calc.history.clear()
-                continue
-
-            if idx < 1 or idx > total_options:
-                print("❌ Geçersiz seçim!")
-                continue
-
-            op_name = ops_list[idx - 1]
-
-            try:
-                if op_name in self.SINGLE_OPERAND_OPS:
-                    a = self._get_float("Sayı: ")
-                    result = self.calc.calculate(op_name, a)
-                    op = self.calc.operations[op_name]
-                    print(f"\n✅ {op.symbol}{a} = {result}")
-                else:
-                    a = self._get_float("1. sayı: ")
-                    b = self._get_float("2. sayı: ")
-                    result = self.calc.calculate(op_name, a, b)
-                    op = self.calc.operations[op_name]
-                    print(f"\n✅ {a} {op.symbol} {b} = {result}")
-
-            except ZeroDivisionError as e:
-                print(f"❌ Bölme Hatası: {e}")
-            except ValueError as e:
-                print(f"❌ Değer Hatası: {e}")
-            except OverflowError as e:
-                print(f"❌ Taşma Hatası: {e}")
-            except KeyError as e:
-                print(f"❌ İşlem Hatası: {e}")
             except Exception as e:
-                logger.exception("Beklenmeyen hata")
-                print(f"❌ Beklenmeyen hata: {e}")
+                print(f"❌ Hata: {e}")
+
+    def _process_calculation(self, user_input: str) -> None:
+        """Kullanıcı girdisini işle ve hesapla."""
+        parts = user_input.split()
+
+        if len(parts) == 2:
+            # Bilimsel işlem: sin 45, sqrt 16, vb.
+            op_key, val = parts
+            try:
+                a = float(val)
+            except ValueError:
+                print("❌ Geçersiz sayı!")
+                return
+            result = self.calc.calculate(op_key, a)
+            print(f"  ✅ {self.calc.OPERATIONS[op_key].symbol()}({a}) = {result}")
+
+        elif len(parts) == 3:
+            # Temel işlem: 5 + 3
+            try:
+                a = float(parts[0])
+                op_key = parts[1]
+                b = float(parts[2])
+            except (ValueError, IndexError):
+                print("❌ Format: <sayı> <işlem> <sayı>  veya  <işlem> <sayı>")
+                return
+            result = self.calc.calculate(op_key, a, b)
+            print(f"  ✅ {a} {self.calc.OPERATIONS[op_key].symbol()} {b} = {result}")
+
+        else:
+            print("❌ Format: <sayı> <işlem> <sayı>  veya  <işlem> <sayı>")
+            print("   Örnek: 5 + 3  |  sqrt 16  |  sin 45")
+
+    def _handle_memory(self, cmd: str) -> None:
+        """Bellek komutlarını işle."""
+        if cmd == "mr":
+            val = self.calc.memory.recall()
+            print(f"  🔢 Bellek: {val}")
+        elif cmd == "mc":
+            self.calc.memory.clear()
+            print("  🗑️ Bellek temizlendi.")
+        elif cmd == "m+" and self.calc.last_result is not None:
+            self.calc.memory.add(self.calc.last_result)
+            print(f"  ➕ Belleğe eklendi: {self.calc.last_result}")
+        elif cmd == "m-" and self.calc.last_result is not None:
+            self.calc.memory.subtract(self.calc.last_result)
+            print(f"  ➖ Bellekten çıkarıldı: {self.calc.last_result}")
+        else:
+            print("  ❌ Bellek komutu: M+ M- MR MC")
+
+    def _show_history(self) -> None:
+        """İşlem geçmişini göster."""
+        records = self.calc.history.get_all()
+        if not records:
+            print("  📋 Geçmiş boş.")
+            return
+        print(f"\n📋 İşlem Geçmişi ({len(records)} kayıt):")
+        print("─" * 50)
+        for record in records:
+            print(f"  {record}")
+
+    @staticmethod
+    def _print_header() -> None:
+        print("╔" + "═" * 48 + "╗")
+        print("║     🧮 Gelişmiş OOP Hesap Makinesi v2.0      ║")
+        print("║     Temel + Bilimsel + Bellek İşlemleri       ║")
+        print("╚" + "═" * 48 + "╝")
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  GİRİŞ NOKTASI
+#  ANA GİRİŞ NOKTASI
 # ═══════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
-    try:
-        ui = CalculatorUI()
-        ui.run()
-    except KeyboardInterrupt:
-        print("\n\n👋 Program sonlandırıldı.")
-    except Exception as e:
-        logger.exception("Kritik hata")
-        print(f"⛔ Kritik hata: {e}")
+    ui = ConsoleUI()
+    ui.run()

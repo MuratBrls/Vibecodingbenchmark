@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-VibeBench Scoring Engine v1.1
-Hız + Mimari Kalite + Kütüphane Kullanımı + Validasyon puanlaması.
+Black Box Deep Analytics — Scoring Engine v2.0
+Hız + Mimari & Temiz Kod + Hata/Deneme + Kütüphane puanlaması.
 """
 
 import logging
 
 from config import TARGETS
 from validator import validate_tool, count_lines, get_total_file_size, analyze_tool_design
+from validator_pro import analyze_pro
 
 logger = logging.getLogger("vibebench.scorer")
 
-# ─── AĞIRLIKLAR ──────────────────────────────────────────────────
-WEIGHT_SPEED       = 0.35   # Hız
-WEIGHT_VALIDATION  = 0.25   # Syntax/runtime doğruluğu
-WEIGHT_ARCH        = 0.25   # Mimari kalite (OOP > Functional > Scripting)
-WEIGHT_LIBRARIES   = 0.15   # Kütüphane kullanımı zenginliği
+# ─── AĞIRLIKLAR v2.0 ────────────────────────────────────────────
+WEIGHT_SPEED       = 0.30   # ⏱️ Net Hız
+WEIGHT_ARCH        = 0.30   # 🏛️ Mimari & Temiz Kod
+WEIGHT_ERROR_RATIO = 0.25   # ❌ Hata/Deneme Oranı
+WEIGHT_LIBRARIES   = 0.15   # 💎 Kütüphane Verimliliği
 
 
 def _speed_score(exec_time, all_times) -> float:
@@ -30,24 +31,12 @@ def _speed_score(exec_time, all_times) -> float:
     return max(0.0, round(100.0 - ((exec_time - fastest) / (slowest - fastest)) * 90.0, 1))
 
 
-def _validation_score(tool_name: str) -> float:
-    try:
-        results = validate_tool(tool_name)
-        if not results:
-            return 0.0
-        ok = sum(1 for r in results if r["syntax_ok"] and r["runtime_ok"])
-        return round((ok / len(results)) * 100.0, 1)
-    except Exception as e:
-        logger.error("%s: validasyon skoru hatası — %s", tool_name, e)
-        return 0.0
-
-
-def _architecture_score(design: dict) -> float:
-    """Mimari kalite puanı (0-100)."""
+def _architecture_score(design: dict, pro_analysis: dict) -> float:
+    """Mimari + Temiz Kod birleşik puanı (0-100)."""
     arch = design.get("architecture", "Scripting")
     base = {"OOP": 80, "Functional": 60, "Scripting": 30, "N/A": 0}.get(arch, 0)
 
-    # Bonus: fonksiyon sayısı (iyi yapılandırılmış kod)
+    # Bonus: fonksiyon sayısı
     funcs = design.get("total_functions", 0)
     func_bonus = min(funcs * 3, 15)
 
@@ -59,30 +48,65 @@ def _architecture_score(design: dict) -> float:
     depth = design.get("max_loop_depth", 0)
     depth_penalty = max(0, (depth - 3) * 5)
 
-    return min(100.0, round(base + func_bonus + class_bonus - depth_penalty, 1))
+    # Mimari taban puanı
+    arch_base = min(100.0, base + func_bonus + class_bonus - depth_penalty)
+
+    # Temiz Kod puanı (validator_pro'dan)
+    clean_code = pro_analysis.get("clean_code_score", 50.0)
+
+    # %60 mimari + %40 temiz kod
+    return min(100.0, round(arch_base * 0.6 + clean_code * 0.4, 1))
+
+
+def _error_ratio_score(telemetry: dict) -> float:
+    """
+    Hata/Deneme oranı puanı (0-100).
+
+    - 0 hata, 0 retry → 100 puan
+    - Her retry -20 puan
+    - Her error -25 puan
+    - Minimum 0
+    """
+    if not telemetry:
+        return 50.0  # Telemetri yok → nötr
+
+    retries = telemetry.get("retries", 0)
+    errors = telemetry.get("errors", 0)
+
+    score = 100.0
+    score -= retries * 20
+    score -= errors * 25
+
+    return max(0.0, round(score, 1))
 
 
 def _library_score(design: dict) -> float:
     """Kütüphane kullanım zenginliği puanı (0-100)."""
     imports = design.get("all_imports", [])
-    # Standart lib hariç harici kütüphaneler daha değerli
     count = len(imports)
     if count == 0:
         return 10.0
     return min(100.0, round(count * 12, 1))
 
 
-def calculate_scores(watcher_results: dict) -> dict:
+def calculate_scores(watcher_results: dict, telemetry_data: dict = None) -> dict:
     """
     Tüm araçlar için nihai skorları hesaplar.
 
+    Args:
+        watcher_results: Watcher sonuçları
+        telemetry_data: {tool_name: telemetry_summary} (opsiyonel)
+
     Returns:
         {tool_name: {
-            speed_score, validation_score, arch_score, library_score, total_score,
+            speed_score, arch_score, error_ratio_score, library_score, total_score,
             rank, execution_time, line_count, file_size_bytes, status,
-            design: {architecture, all_imports, total_functions, ...}
+            design, pro_analysis, telemetry
         }}
     """
+    if telemetry_data is None:
+        telemetry_data = {}
+
     all_times = []
     raw = {}
 
@@ -92,6 +116,7 @@ def calculate_scores(watcher_results: dict) -> dict:
         lines = count_lines(target_dir)
         size = get_total_file_size(target_dir)
         design = analyze_tool_design(tool_name)
+        pro = analyze_pro(tool_name)
 
         all_times.append(exec_time)
         raw[tool_name] = {
@@ -100,19 +125,21 @@ def calculate_scores(watcher_results: dict) -> dict:
             "file_size_bytes": size,
             "status": result.get("status", "unknown"),
             "design": design,
+            "pro_analysis": pro,
+            "telemetry": telemetry_data.get(tool_name, {}),
         }
 
     scores = {}
     for tool_name, data in raw.items():
         spd = _speed_score(data["execution_time"], all_times)
-        val = _validation_score(tool_name)
-        arch = _architecture_score(data["design"])
+        arch = _architecture_score(data["design"], data["pro_analysis"])
+        err = _error_ratio_score(data["telemetry"])
         lib = _library_score(data["design"])
 
         total = round(
             spd  * WEIGHT_SPEED +
-            val  * WEIGHT_VALIDATION +
             arch * WEIGHT_ARCH +
+            err  * WEIGHT_ERROR_RATIO +
             lib  * WEIGHT_LIBRARIES,
             1,
         )
@@ -120,8 +147,8 @@ def calculate_scores(watcher_results: dict) -> dict:
         scores[tool_name] = {
             **data,
             "speed_score": spd,
-            "validation_score": val,
             "arch_score": arch,
+            "error_ratio_score": err,
             "library_score": lib,
             "total_score": total,
             "rank": 0,

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-VibeBench Logging & Final Report Module
+Black Box Deep Analytics — Logging & Final Report Module v2.0
 Tüm süreci logs/ altına kaydeder ve final raporu üretir.
 """
 
@@ -59,22 +59,43 @@ def save_final_report(scores: dict, prompt_text: str, log_file: str) -> str:
 
         report = {
             "timestamp": timestamp,
+            "version": "2.0",
             "prompt": prompt_text[:500],
             "log_file": log_file,
+            "weights": {
+                "speed": 0.30,
+                "architecture": 0.30,
+                "error_ratio": 0.25,
+                "libraries": 0.15,
+            },
             "results": {},
         }
 
         for tool_name, data in scores.items():
+            tele = data.get("telemetry", {})
+            pro = data.get("pro_analysis", {})
             report["results"][tool_name] = {
                 "rank": data["rank"],
                 "total_score": data["total_score"],
                 "speed_score": data["speed_score"],
-                "lines_score": data["lines_score"],
-                "validation_score": data["validation_score"],
+                "arch_score": data["arch_score"],
+                "error_ratio_score": data["error_ratio_score"],
+                "library_score": data["library_score"],
                 "execution_time": data["execution_time"],
                 "line_count": data["line_count"],
                 "file_size_bytes": data["file_size_bytes"],
                 "status": data["status"],
+                "telemetry": {
+                    "saves": tele.get("saves", 0),
+                    "retries": tele.get("retries", 0),
+                    "errors": tele.get("errors", 0),
+                },
+                "pro_analysis": {
+                    "mccabe_avg": pro.get("mccabe_avg", 0),
+                    "pep8_compliance": pro.get("pep8_compliance", 0),
+                    "security_count": pro.get("security_count", 0),
+                    "clean_code_score": pro.get("clean_code_score", 0),
+                },
             }
 
         # Kazanan

@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-VibeBench Configuration Engine v1.1
+Black Box Deep Analytics — Configuration Engine v2.0
 Tüm yollar, parametreler ve sabitler.
 """
 
 import os
+
+# ─── META ────────────────────────────────────────────────────────
+VERSION  = "2.0"
+APP_NAME = "Black Box Deep Analytics"
 
 # ─── BASE ────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -1,11 +1,16 @@
 {
   "status": "completed",
-  "signal_time": 1771245380.7764149,
-  "end_time": 1771245423.537877,
-  "net_execution_time": 42.761,
-  "gross_time": 136.947,
+  "signal_time": 1771251309.0676012,
+  "end_time": 1771251363.1925955,
+  "net_execution_time": 54.125,
+  "gross_time": 89.016,
   "tool": "Antigravity",
   "detected_files": [
     "calculator.py"
-  ]
+  ],
+  "telemetry": {
+    "saves": 1,
+    "retries": 3,
+    "errors": 0
+  }
 }

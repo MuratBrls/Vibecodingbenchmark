@@ -1,11 +1,16 @@
 {
   "status": "completed",
-  "signal_time": 1771245389.0749757,
-  "end_time": 1771245413.2905033,
-  "net_execution_time": 24.216,
-  "gross_time": 126.7,
+  "signal_time": 1771251331.5318062,
+  "end_time": 1771251331.5363572,
+  "net_execution_time": 0.005,
+  "gross_time": 57.36,
   "tool": "Windsurf",
   "detected_files": [
-    "calculator.py"
-  ]
+    "stopwatch_monitor.py"
+  ],
+  "telemetry": {
+    "saves": 1,
+    "retries": 2,
+    "errors": 0
+  }
 }

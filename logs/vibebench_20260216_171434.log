@@ -1,0 +1,26 @@
+[17:14:34] INFO     vibebench.logger          │ VibeBench logging başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\logs\vibebench_20260216_171434.log
+[17:14:34] INFO     vibebench.main            │ Black Box Deep Analytics v2.0 başlatıldı — prompt: Gelişmiş, Nesne Yönelimli bir hesap makinesi yaz
+[17:14:34] INFO     vibebench.precheck        │ ✅ Antigravity: yazma izni OK — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchantigravity
+[17:14:34] INFO     vibebench.precheck        │ ✅ Cursor: yazma izni OK — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchcursor
+[17:14:34] INFO     vibebench.precheck        │ ✅ Windsurf: yazma izni OK — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchwindsurf
+[17:14:34] INFO     vibebench.distributor     │ Antigravity: task_input.txt dağıtıldı
+[17:14:34] INFO     vibebench.distributor     │ Cursor: task_input.txt dağıtıldı
+[17:14:34] INFO     vibebench.distributor     │ Windsurf: task_input.txt dağıtıldı
+[17:14:34] INFO     vibebench.telemetry       │ Antigravity: telemetry tracker oluşturuldu
+[17:14:34] INFO     vibebench.telemetry       │ Cursor: telemetry tracker oluşturuldu
+[17:14:34] INFO     vibebench.telemetry       │ Windsurf: telemetry tracker oluşturuldu
+[17:14:34] INFO     vibebench.watcher         │ Antigravity: gözlemci başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchantigravity
+[17:14:34] INFO     vibebench.watcher         │ Cursor: gözlemci başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchcursor
+[17:14:34] INFO     vibebench.watcher         │ Windsurf: gözlemci başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchwindsurf
+[17:15:09] INFO     vibebench.watcher         │ Antigravity: 🟢 start_signal.json alındı — kronometre başladı
+[17:15:09] INFO     vibebench.telemetry       │ Antigravity: 🔄 Retry algılandı (toplam: 1)
+[17:15:09] INFO     vibebench.telemetry       │ Antigravity: 🔄 Retry algılandı (toplam: 2)
+[17:15:09] INFO     vibebench.telemetry       │ Antigravity: 🔄 Retry algılandı (toplam: 3)
+[17:15:31] INFO     vibebench.watcher         │ Windsurf: 🟢 start_signal.json alındı — kronometre başladı
+[17:15:31] INFO     vibebench.telemetry       │ Windsurf: 🔄 Retry algılandı (toplam: 1)
+[17:15:31] INFO     vibebench.telemetry       │ Windsurf: 🔄 Retry algılandı (toplam: 2)
+[17:15:31] INFO     vibebench.watcher         │ Windsurf: ✅ tamamlandı — stopwatch_monitor.py (net: 0.005s)
+[17:16:03] INFO     vibebench.watcher         │ Antigravity: ✅ tamamlandı — calculator.py (net: 54.125s)
+[17:24:34] INFO     vibebench.logger          │ Final rapor kaydedildi: C:\Users\egule\Documents\github\Vibecodingbenchmark\logs\report_20260216_172434.json
+[17:24:34] INFO     vibebench.html_report     │ HTML rapor oluşturuldu: C:\Users\egule\Documents\github\Vibecodingbenchmark\logs\report_20260216_172434.html
+[17:24:34] INFO     vibebench.main            │ 🏆 KAZANAN: Windsurf (skor: 74.2, net süre: 0.005s)

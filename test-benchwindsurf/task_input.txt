@@ -1,1 +1,1 @@
-Gelişmiş ve Nesne Yönelimli (OOP) bir hesap makinesi yaz
+Gelişmiş, Nesne Yönelimli bir hesap makinesi yaz

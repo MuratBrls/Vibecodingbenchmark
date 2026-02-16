@@ -1,0 +1,84 @@
+{
+  "timestamp": "20260216_172434",
+  "version": "2.0",
+  "prompt": "Gelişmiş, Nesne Yönelimli bir hesap makinesi yaz",
+  "log_file": "C:\\Users\\egule\\Documents\\github\\Vibecodingbenchmark\\logs\\vibebench_20260216_171434.log",
+  "weights": {
+    "speed": 0.3,
+    "architecture": 0.3,
+    "error_ratio": 0.25,
+    "libraries": 0.15
+  },
+  "results": {
+    "Antigravity": {
+      "rank": 3,
+      "total_score": 41.5,
+      "speed_score": 10.0,
+      "arch_score": 98.2,
+      "error_ratio_score": 0.0,
+      "library_score": 60,
+      "execution_time": 54.125,
+      "line_count": 440,
+      "file_size_bytes": 15353,
+      "status": "completed",
+      "telemetry": {
+        "saves": 4,
+        "retries": 3,
+        "errors": 3
+      },
+      "pro_analysis": {
+        "mccabe_avg": 1.59,
+        "pep8_compliance": 100.0,
+        "security_count": 1,
+        "clean_code_score": 95.5
+      }
+    },
+    "Cursor": {
+      "rank": 2,
+      "total_score": 41.8,
+      "speed_score": 0.0,
+      "arch_score": 51.0,
+      "error_ratio_score": 100.0,
+      "library_score": 10.0,
+      "execution_time": null,
+      "line_count": 0,
+      "file_size_bytes": 0,
+      "status": "timeout",
+      "telemetry": {
+        "saves": 0,
+        "retries": 0,
+        "errors": 0
+      },
+      "pro_analysis": {
+        "mccabe_avg": 0.0,
+        "pep8_compliance": 100.0,
+        "security_count": 0,
+        "clean_code_score": 82.5
+      }
+    },
+    "Windsurf": {
+      "rank": 1,
+      "total_score": 74.2,
+      "speed_score": 100.0,
+      "arch_score": 94.3,
+      "error_ratio_score": 35.0,
+      "library_score": 48,
+      "execution_time": 0.005,
+      "line_count": 60,
+      "file_size_bytes": 2319,
+      "status": "completed",
+      "telemetry": {
+        "saves": 2,
+        "retries": 2,
+        "errors": 1
+      },
+      "pro_analysis": {
+        "mccabe_avg": 3.33,
+        "pep8_compliance": 88.3,
+        "security_count": 0,
+        "clean_code_score": 94.8
+      }
+    }
+  },
+  "winner": "Windsurf"
+}

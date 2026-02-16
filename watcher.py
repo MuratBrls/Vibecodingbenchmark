@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-VibeBench Live Watcher v1.1 — Signal Trigger
+Black Box Deep Analytics — Live Watcher v2.0 (Signal Trigger + Telemetry)
 start_signal.json oluştuğu an kronometre başlar,
 kaynak kod dosyası oluştuğu an kronometre durur.
-İnsan bekleme süresi elenir.
+Telemetri: save sayısı, retry sayısı, hata sayısı.
 """
 
 import json
@@ -19,6 +19,7 @@ from config import (
     TARGETS, STATUS_FILE, TASK_INPUT_FILE, START_SIGNAL_FILE,
     WATCHED_EXTENSIONS, WATCH_TIMEOUT,
 )
+from telemetry import TelemetryTracker, create_trackers
 
 logger = logging.getLogger("vibebench.watcher")
 
@@ -27,17 +28,19 @@ IGNORED_FILES = {TASK_INPUT_FILE, STATUS_FILE, START_SIGNAL_FILE}
 
 class BenchmarkEventHandler(FileSystemEventHandler):
     """
-    İki aşamalı izleme:
+    İki aşamalı izleme + telemetri:
       Aşama 1: start_signal.json bekle → signal_time kaydedilir
       Aşama 2: kaynak kod dosyası bekle → end_time kaydedilir
+    Telemetri: her dosya olayı kaydedilir.
     Net süre = end_time - signal_time
     """
 
-    def __init__(self, tool_name: str, target_dir: str, global_start: float, on_complete):
+    def __init__(self, tool_name: str, target_dir: str, global_start: float,
+                 on_complete, telemetry_tracker: TelemetryTracker):
         super().__init__()
         self.tool_name = tool_name
         self.target_dir = target_dir
-        self.global_start = global_start  # prompt dağıtım anı (dashboard için)
+        self.global_start = global_start
 
         # Signal trigger
         self.signal_received = False
@@ -47,6 +50,9 @@ class BenchmarkEventHandler(FileSystemEventHandler):
         self.completed = False
         self.end_time = None
         self.detected_files = []
+
+        # Telemetry
+        self.telemetry = telemetry_tracker
 
         self._on_complete = on_complete
         self._lock = threading.Lock()
@@ -68,6 +74,7 @@ class BenchmarkEventHandler(FileSystemEventHandler):
         # ── AŞAMA 1: Signal Trigger ────────────────────────────
         if self._is_signal(src):
             with self._lock:
+                self.telemetry.record_signal()
                 if not self.signal_received:
                     self.signal_time = time.time()
                     self.signal_received = True
@@ -79,6 +86,9 @@ class BenchmarkEventHandler(FileSystemEventHandler):
             return
         if not self._is_watched(src):
             return
+
+        # Telemetri: her save olayını kaydet
+        self.telemetry.record_save(src)
 
         with self._lock:
             if src not in self.detected_files:
@@ -111,6 +121,7 @@ class BenchmarkEventHandler(FileSystemEventHandler):
         try:
             net_time = round(self.end_time - self.signal_time, 3)
             gross_time = round(self.end_time - self.global_start, 3)
+            tele = self.telemetry.get_summary()
             data = {
                 "status": "completed",
                 "signal_time": self.signal_time,
@@ -119,6 +130,11 @@ class BenchmarkEventHandler(FileSystemEventHandler):
                 "gross_time": gross_time,
                 "tool": self.tool_name,
                 "detected_files": [os.path.basename(f) for f in self.detected_files],
+                "telemetry": {
+                    "saves": tele["saves"],
+                    "retries": tele["retries"],
+                    "errors": tele["errors"],
+                },
             }
             with open(os.path.join(self.target_dir, STATUS_FILE), "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
@@ -147,12 +163,13 @@ class BenchmarkEventHandler(FileSystemEventHandler):
 
 
 class BenchmarkWatcher:
-    """Tüm hedef klasörleri paralel olarak izler."""
+    """Tüm hedef klasörleri paralel olarak izler + telemetri."""
 
     def __init__(self, start_time: float):
         self.start_time = start_time
         self.observers = []
         self.handlers = {}
+        self.telemetry_trackers = create_trackers()
         self._completed_count = 0
         self._total = len(TARGETS)
         self._lock = threading.Lock()
@@ -167,11 +184,13 @@ class BenchmarkWatcher:
     def start(self):
         for tool_name, target_dir in TARGETS.items():
             try:
+                tracker = self.telemetry_trackers.get(tool_name)
                 handler = BenchmarkEventHandler(
                     tool_name=tool_name,
                     target_dir=target_dir,
                     global_start=self.start_time,
                     on_complete=self._on_tool_complete,
+                    telemetry_tracker=tracker,
                 )
                 observer = Observer()
                 observer.schedule(handler, target_dir, recursive=True)
@@ -200,6 +219,7 @@ class BenchmarkWatcher:
     def get_results(self) -> dict:
         results = {}
         for tool_name, handler in self.handlers.items():
+            tele_summary = handler.telemetry.get_summary()
             if handler.completed:
                 results[tool_name] = {
                     "status": "completed",
@@ -207,6 +227,7 @@ class BenchmarkWatcher:
                     "gross_time": handler.elapsed,
                     "signal_received": handler.signal_received,
                     "detected_files": [os.path.basename(f) for f in handler.detected_files],
+                    "telemetry": tele_summary,
                 }
             else:
                 results[tool_name] = {
@@ -215,5 +236,13 @@ class BenchmarkWatcher:
                     "gross_time": None,
                     "signal_received": handler.signal_received,
                     "detected_files": [],
+                    "telemetry": tele_summary,
                 }
         return results
+
+    def get_telemetry_data(self) -> dict:
+        """Tüm telemetri verilerini döndürür."""
+        data = {}
+        for tool_name, handler in self.handlers.items():
+            data[tool_name] = handler.telemetry.get_summary()
+        return data

@@ -1,11 +1,7 @@
 {
-  "status": "completed",
-  "signal_time": 1771245472.375082,
-  "end_time": 1771245501.5440428,
-  "net_execution_time": 29.169,
-  "gross_time": 214.954,
-  "tool": "Cursor",
-  "detected_files": [
-    "calculator.py"
-  ]
+  "status": "pending",
+  "start_time": 1771251274.176625,
+  "end_time": null,
+  "execution_time": null,
+  "tool": "Cursor"
 }
