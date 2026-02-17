@@ -1,0 +1,36 @@
+[12:25:45] INFO     vibebench.logger          │ VibeBench logging başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\logs\vibebench_20260217_122545.log
+[12:25:45] INFO     vibebench.main            │ Black Box Deep Analytics v2.1 başlatıldı — prompt: Kendi kendini organize eden, OOP mimarili bir Medya Kütüphanesi yaz.
+[12:25:45] INFO     vibebench.precheck        │ ✅ Antigravity: yazma izni OK — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchantigravity
+[12:25:45] INFO     vibebench.precheck        │ ✅ Cursor: yazma izni OK — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchcursor
+[12:25:45] INFO     vibebench.precheck        │ ✅ Windsurf: yazma izni OK — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchwindsurf
+[12:25:45] INFO     vibebench.distributor     │ Antigravity: task_input.txt dağıtıldı
+[12:25:45] INFO     vibebench.distributor     │ Cursor: task_input.txt dağıtıldı
+[12:25:45] INFO     vibebench.distributor     │ Windsurf: task_input.txt dağıtıldı
+[12:25:45] INFO     vibebench.telemetry       │ Antigravity: telemetry tracker oluşturuldu
+[12:25:45] INFO     vibebench.telemetry       │ Cursor: telemetry tracker oluşturuldu
+[12:25:45] INFO     vibebench.telemetry       │ Windsurf: telemetry tracker oluşturuldu
+[12:25:45] INFO     vibebench.watcher         │ Antigravity: gözlemci başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchantigravity
+[12:25:45] INFO     vibebench.watcher         │ Cursor: gözlemci başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchcursor
+[12:25:45] INFO     vibebench.watcher         │ Windsurf: gözlemci başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchwindsurf
+[12:26:04] INFO     vibebench.telemetry       │ Antigravity: 🧠 Düşünme süresi: 19.250s
+[12:26:04] INFO     vibebench.watcher         │ Antigravity: 🟢 start_signal.json alındı — kronometre başladı (düşünme: 19.250s)
+[12:26:05] INFO     vibebench.telemetry       │ Antigravity: 🔄 Retry algılandı (toplam: 1)
+[12:26:05] INFO     vibebench.telemetry       │ Antigravity: 🔄 Retry algılandı (toplam: 2)
+[12:26:05] INFO     vibebench.telemetry       │ Antigravity: 🔄 Retry algılandı (toplam: 3)
+[12:26:18] INFO     vibebench.telemetry       │ Cursor: 🧠 Düşünme süresi: 33.253s
+[12:26:18] INFO     vibebench.watcher         │ Cursor: 🟢 start_signal.json alındı — kronometre başladı (düşünme: 33.253s)
+[12:26:18] INFO     vibebench.telemetry       │ Cursor: 🔄 Retry algılandı (toplam: 1)
+[12:26:18] INFO     vibebench.telemetry       │ Cursor: 🔄 Retry algılandı (toplam: 2)
+[12:26:46] INFO     vibebench.telemetry       │ Cursor: ✍️ Yazma süresi: 27.251s
+[12:26:46] INFO     vibebench.watcher         │ Cursor: ✅ tamamlandı — media_lib.py (düşünme: 33.253s, yazma: 27.251s, toplam: 60.504s)
+[12:27:08] INFO     vibebench.telemetry       │ Antigravity: ✍️ Yazma süresi: 64.042s
+[12:27:08] INFO     vibebench.watcher         │ Antigravity: ✅ tamamlandı — media_lib.py (düşünme: 19.250s, yazma: 64.042s, toplam: 83.292s)
+[12:27:49] INFO     vibebench.telemetry       │ Windsurf: 🧠 Düşünme süresi: 124.232s
+[12:27:49] INFO     vibebench.watcher         │ Windsurf: 🟢 start_signal.json alındı — kronometre başladı (düşünme: 124.232s)
+[12:27:49] INFO     vibebench.telemetry       │ Windsurf: 🔄 Retry algılandı (toplam: 1)
+[12:27:49] INFO     vibebench.telemetry       │ Windsurf: ✍️ Yazma süresi: 0.008s
+[12:27:49] INFO     vibebench.watcher         │ Windsurf: ✅ tamamlandı — media_lib.py (düşünme: 124.232s, yazma: 0.008s, toplam: 124.240s)
+[12:27:49] INFO     vibebench.telemetry       │ Windsurf: 🔄 Retry algılandı (toplam: 2)
+[12:27:50] INFO     vibebench.logger          │ Final rapor kaydedildi: C:\Users\egule\Documents\github\Vibecodingbenchmark\logs\report_20260217_122750.json
+[12:27:50] INFO     vibebench.html_report     │ HTML rapor oluşturuldu: C:\Users\egule\Documents\github\Vibecodingbenchmark\logs\report_20260217_122750.html
+[12:27:50] INFO     vibebench.main            │ 🏆 KAZANAN: Cursor (skor: 92.1, net süre: 27.251s)

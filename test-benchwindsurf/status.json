@@ -1,16 +1,21 @@
 {
   "status": "completed",
-  "signal_time": 1771251331.5318062,
-  "end_time": 1771251331.5363572,
-  "net_execution_time": 0.005,
-  "gross_time": 57.36,
+  "signal_time": 1771320525.5350325,
+  "end_time": 1771320600.5868192,
+  "thinking_time": 3.538,
+  "writing_time": 75.052,
+  "total_time": 78.59,
+  "net_execution_time": 75.052,
+  "gross_time": 78.59,
   "tool": "Windsurf",
   "detected_files": [
-    "stopwatch_monitor.py"
+    "main.py"
   ],
   "telemetry": {
     "saves": 1,
-    "retries": 2,
-    "errors": 0
+    "retries": 5,
+    "errors": 0,
+    "thinking_time": 3.538,
+    "writing_time": 75.052
   }
 }

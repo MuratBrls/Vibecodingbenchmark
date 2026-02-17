@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Black Box Deep Analytics — Live Watcher v2.0 (Signal Trigger + Telemetry)
+Black Box Deep Analytics — Live Watcher v2.1 (Total Performance)
 start_signal.json oluştuğu an kronometre başlar,
 kaynak kod dosyası oluştuğu an kronometre durur.
+Thinking time: global_start → signal
+Writing time:  signal → kod
 Telemetri: save sayısı, retry sayısı, hata sayısı.
 """
 
@@ -29,10 +31,9 @@ IGNORED_FILES = {TASK_INPUT_FILE, STATUS_FILE, START_SIGNAL_FILE}
 class BenchmarkEventHandler(FileSystemEventHandler):
     """
     İki aşamalı izleme + telemetri:
-      Aşama 1: start_signal.json bekle → signal_time kaydedilir
-      Aşama 2: kaynak kod dosyası bekle → end_time kaydedilir
+      Aşama 1: start_signal.json bekle → signal_time kaydedilir, thinking_time hesaplanır
+      Aşama 2: kaynak kod dosyası bekle → end_time kaydedilir, writing_time hesaplanır
     Telemetri: her dosya olayı kaydedilir.
-    Net süre = end_time - signal_time
     """
 
     def __init__(self, tool_name: str, target_dir: str, global_start: float,
@@ -74,11 +75,12 @@ class BenchmarkEventHandler(FileSystemEventHandler):
         # ── AŞAMA 1: Signal Trigger ────────────────────────────
         if self._is_signal(src):
             with self._lock:
-                self.telemetry.record_signal()
+                self.telemetry.record_signal(self.global_start)
                 if not self.signal_received:
                     self.signal_time = time.time()
                     self.signal_received = True
-                    logger.info("%s: 🟢 start_signal.json alındı — kronometre başladı", self.tool_name)
+                    logger.info("%s: 🟢 start_signal.json alındı — kronometre başladı (düşünme: %.3fs)",
+                                self.tool_name, self.signal_time - self.global_start)
             return
 
         # ── AŞAMA 2: Kod Dosyası ───────────────────────────────
@@ -107,9 +109,14 @@ class BenchmarkEventHandler(FileSystemEventHandler):
 
             self.completed = True
 
+        # Telemetri: yazma süresi kaydı
+        self.telemetry.record_completion(self.signal_time)
+
         self._update_status()
         net_time = self.end_time - self.signal_time
-        logger.info("%s: ✅ tamamlandı — %s (net: %.3fs)", self.tool_name, basename, net_time)
+        thinking = self.signal_time - self.global_start
+        logger.info("%s: ✅ tamamlandı — %s (düşünme: %.3fs, yazma: %.3fs, toplam: %.3fs)",
+                    self.tool_name, basename, thinking, net_time, thinking + net_time)
 
         try:
             if self._on_complete:
@@ -119,21 +126,27 @@ class BenchmarkEventHandler(FileSystemEventHandler):
 
     def _update_status(self):
         try:
-            net_time = round(self.end_time - self.signal_time, 3)
-            gross_time = round(self.end_time - self.global_start, 3)
+            writing_time = round(self.end_time - self.signal_time, 3)
+            thinking_time = round(self.signal_time - self.global_start, 3)
+            total_time = round(thinking_time + writing_time, 3)
             tele = self.telemetry.get_summary()
             data = {
                 "status": "completed",
                 "signal_time": self.signal_time,
                 "end_time": self.end_time,
-                "net_execution_time": net_time,
-                "gross_time": gross_time,
+                "thinking_time": thinking_time,
+                "writing_time": writing_time,
+                "total_time": total_time,
+                "net_execution_time": writing_time,  # geriye uyumluluk
+                "gross_time": total_time,
                 "tool": self.tool_name,
                 "detected_files": [os.path.basename(f) for f in self.detected_files],
                 "telemetry": {
                     "saves": tele["saves"],
                     "retries": tele["retries"],
                     "errors": tele["errors"],
+                    "thinking_time": tele["thinking_time"],
+                    "writing_time": tele["writing_time"],
                 },
             }
             with open(os.path.join(self.target_dir, STATUS_FILE), "w", encoding="utf-8") as f:
@@ -142,11 +155,32 @@ class BenchmarkEventHandler(FileSystemEventHandler):
             logger.error("%s: status.json güncelleme hatası — %s", self.tool_name, e)
 
     @property
-    def net_execution_time(self):
-        """Net süre (signal → kod)."""
+    def thinking_time(self):
+        """Düşünme süresi (global_start → signal)."""
+        if self.signal_received and self.signal_time:
+            return round(self.signal_time - self.global_start, 3)
+        return None
+
+    @property
+    def writing_time(self):
+        """Yazma süresi (signal → kod)."""
         if self.completed and self.signal_time and self.end_time:
             return round(self.end_time - self.signal_time, 3)
         return None
+
+    @property
+    def total_time(self):
+        """Toplam süre (thinking + writing)."""
+        t = self.thinking_time
+        w = self.writing_time
+        if t is not None and w is not None:
+            return round(t + w, 3)
+        return None
+
+    @property
+    def net_execution_time(self):
+        """Net süre (signal → kod) — geriye uyumluluk."""
+        return self.writing_time
 
     @property
     def elapsed(self):
@@ -223,7 +257,10 @@ class BenchmarkWatcher:
             if handler.completed:
                 results[tool_name] = {
                     "status": "completed",
-                    "execution_time": handler.net_execution_time,
+                    "execution_time": handler.writing_time,
+                    "thinking_time": handler.thinking_time,
+                    "writing_time": handler.writing_time,
+                    "total_time": handler.total_time,
                     "gross_time": handler.elapsed,
                     "signal_received": handler.signal_received,
                     "detected_files": [os.path.basename(f) for f in handler.detected_files],
@@ -233,6 +270,9 @@ class BenchmarkWatcher:
                 results[tool_name] = {
                     "status": "timeout",
                     "execution_time": None,
+                    "thinking_time": handler.thinking_time,
+                    "writing_time": None,
+                    "total_time": None,
                     "gross_time": None,
                     "signal_received": handler.signal_received,
                     "detected_files": [],

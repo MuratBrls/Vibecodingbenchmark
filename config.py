@@ -7,7 +7,7 @@ Tüm yollar, parametreler ve sabitler.
 import os
 
 # ─── META ────────────────────────────────────────────────────────
-VERSION  = "2.0"
+VERSION  = "2.1"
 APP_NAME = "Black Box Deep Analytics"
 
 # ─── BASE ────────────────────────────────────────────────────────

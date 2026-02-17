@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Black Box Deep Analytics — Scoring Engine v2.0
-Hız + Mimari & Temiz Kod + Hata/Deneme + Kütüphane puanlaması.
+Black Box Deep Analytics — Scoring Engine v2.1 (Total Performance)
+Hız (thinking + writing) + Mimari & Temiz Kod + Hata/Deneme + Kütüphane puanlaması.
+Her hata/retry toplam skordan %10 ceza.
 """
 
 import logging
@@ -12,15 +13,19 @@ from validator_pro import analyze_pro
 
 logger = logging.getLogger("vibebench.scorer")
 
-# ─── AĞIRLIKLAR v2.0 ────────────────────────────────────────────
-WEIGHT_SPEED       = 0.30   # ⏱️ Net Hız
+# ─── AĞIRLIKLAR v2.1 ────────────────────────────────────────────
+WEIGHT_SPEED       = 0.30   # ⏱️ Toplam Hız (thinking + writing)
 WEIGHT_ARCH        = 0.30   # 🏛️ Mimari & Temiz Kod
 WEIGHT_ERROR_RATIO = 0.25   # ❌ Hata/Deneme Oranı
 WEIGHT_LIBRARIES   = 0.15   # 💎 Kütüphane Verimliliği
 
+# v2.1: Her hata/retry için toplam skordan %10 ceza
+ERROR_PENALTY_PER_ATTEMPT = 10.0
 
-def _speed_score(exec_time, all_times) -> float:
-    if exec_time is None:
+
+def _speed_score(total_time, all_times) -> float:
+    """Hız puanı — total_time (thinking + writing) üzerinden hesaplanır."""
+    if total_time is None:
         return 0.0
     valid = [t for t in all_times if t is not None]
     if not valid:
@@ -28,7 +33,7 @@ def _speed_score(exec_time, all_times) -> float:
     fastest, slowest = min(valid), max(valid)
     if fastest == slowest:
         return 100.0
-    return max(0.0, round(100.0 - ((exec_time - fastest) / (slowest - fastest)) * 90.0, 1))
+    return max(0.0, round(100.0 - ((total_time - fastest) / (slowest - fastest)) * 90.0, 1))
 
 
 def _architecture_score(design: dict, pro_analysis: dict) -> float:
@@ -62,9 +67,9 @@ def _error_ratio_score(telemetry: dict) -> float:
     """
     Hata/Deneme oranı puanı (0-100).
 
+    v2.1: Her failed_attempt (retry + error) için %10 puan kır.
     - 0 hata, 0 retry → 100 puan
-    - Her retry -20 puan
-    - Her error -25 puan
+    - Her retry/error -10 puan
     - Minimum 0
     """
     if not telemetry:
@@ -73,9 +78,8 @@ def _error_ratio_score(telemetry: dict) -> float:
     retries = telemetry.get("retries", 0)
     errors = telemetry.get("errors", 0)
 
-    score = 100.0
-    score -= retries * 20
-    score -= errors * 25
+    total_fails = retries + errors
+    score = 100.0 - (total_fails * ERROR_PENALTY_PER_ATTEMPT)
 
     return max(0.0, round(score, 1))
 
@@ -100,27 +104,34 @@ def calculate_scores(watcher_results: dict, telemetry_data: dict = None) -> dict
     Returns:
         {tool_name: {
             speed_score, arch_score, error_ratio_score, library_score, total_score,
-            rank, execution_time, line_count, file_size_bytes, status,
+            rank, execution_time, thinking_time, writing_time, total_time,
+            line_count, file_size_bytes, status,
             design, pro_analysis, telemetry
         }}
     """
     if telemetry_data is None:
         telemetry_data = {}
 
-    all_times = []
+    all_total_times = []
     raw = {}
 
     for tool_name, result in watcher_results.items():
-        exec_time = result.get("execution_time")
+        thinking = result.get("thinking_time")
+        writing = result.get("writing_time")
+        total_time = result.get("total_time")
+
         target_dir = TARGETS.get(tool_name, "")
         lines = count_lines(target_dir)
         size = get_total_file_size(target_dir)
         design = analyze_tool_design(tool_name)
         pro = analyze_pro(tool_name)
 
-        all_times.append(exec_time)
+        all_total_times.append(total_time)
         raw[tool_name] = {
-            "execution_time": exec_time,
+            "execution_time": writing,  # geriye uyumluluk
+            "thinking_time": thinking,
+            "writing_time": writing,
+            "total_time": total_time,
             "line_count": lines,
             "file_size_bytes": size,
             "status": result.get("status", "unknown"),
@@ -131,7 +142,8 @@ def calculate_scores(watcher_results: dict, telemetry_data: dict = None) -> dict
 
     scores = {}
     for tool_name, data in raw.items():
-        spd = _speed_score(data["execution_time"], all_times)
+        # v2.1: Hız skoru total_time üzerinden
+        spd = _speed_score(data["total_time"], all_total_times)
         arch = _architecture_score(data["design"], data["pro_analysis"])
         err = _error_ratio_score(data["telemetry"])
         lib = _library_score(data["design"])

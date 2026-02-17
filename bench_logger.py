@@ -59,7 +59,7 @@ def save_final_report(scores: dict, prompt_text: str, log_file: str) -> str:
 
         report = {
             "timestamp": timestamp,
-            "version": "2.0",
+            "version": "2.1",
             "prompt": prompt_text[:500],
             "log_file": log_file,
             "weights": {
@@ -81,6 +81,9 @@ def save_final_report(scores: dict, prompt_text: str, log_file: str) -> str:
                 "arch_score": data["arch_score"],
                 "error_ratio_score": data["error_ratio_score"],
                 "library_score": data["library_score"],
+                "thinking_time": data.get("thinking_time"),
+                "writing_time": data.get("writing_time"),
+                "total_time": data.get("total_time"),
                 "execution_time": data["execution_time"],
                 "line_count": data["line_count"],
                 "file_size_bytes": data["file_size_bytes"],
@@ -89,6 +92,8 @@ def save_final_report(scores: dict, prompt_text: str, log_file: str) -> str:
                     "saves": tele.get("saves", 0),
                     "retries": tele.get("retries", 0),
                     "errors": tele.get("errors", 0),
+                    "thinking_time": tele.get("thinking_time"),
+                    "writing_time": tele.get("writing_time"),
                 },
                 "pro_analysis": {
                     "mccabe_avg": pro.get("mccabe_avg", 0),

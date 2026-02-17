@@ -51,9 +51,8 @@ def cmd_run(args):
     # ── 0.1 KULLANICI REHBERİ ──────────────────────────────────
     console.print(Panel(
         "[bold bright_yellow]🎯 HOŞ GELDİN![/]\n\n"
-        "Black Box Deep Analytics sistemi şu an AI araçlarını izlemeye hazır.\n"
-        "Benchmark başarılı olması için AI araçlarının (Antigravity, Cursor, Windsurf)\n"
-        "protokolü takip etmesi gerekiyor.\n\n"
+        "Black Box Deep Analytics v2.1 — Total Performance sistemi AI araçlarını izlemeye hazır.\n"
+        "Hem düşünme (thinking) hem yazma (writing) süreleri ayrı ayrı ölçülür.\n\n"
         "[bold bright_cyan]📋 AI'LARA VERİLECEK KOMUT:[/]\n"
         "[dim]═══════════════════════════════════════════════════════════════════[/]\n"
         '[bright_white]"Önce \'start_signal.json\' oluştur, sonra OOP yapısında\n'
@@ -61,20 +60,20 @@ def cmd_run(args):
         'Hızlı ol, telemetri seni izliyor!"[/]\n'
         "[dim]═══════════════════════════════════════════════════════════════════[/]\n\n"
         "[bold bright_green]✅ PROTOKOL ADIMLARI:[/]\n"
-        "  [bright_cyan]1.[/] [bold]start_signal.json[/] oluştur → ⏱️ kronometre başlar\n"
-        "  [bright_cyan]2.[/] Kodu yaz ve kaydet → ⏱️ kronometre durur\n"
+        "  [bright_cyan]1.[/] [bold]start_signal.json[/] oluştur → 🧠 düşünme süresi biter, ✍️ yazma başlar\n"
+        "  [bright_cyan]2.[/] Kodu yaz ve kaydet → ✍️ yazma süresi durur\n"
         "  [bright_cyan]3.[/] [bold]start_signal.json[/] sil → ✅ protokol tamamlandı\n\n"
-        "[bold bright_magenta]📊 PUANLAMA SİSTEMİ:[/]\n"
-        "  • ⏱️  30% Net Hız\n"
+        "[bold bright_magenta]📊 PUANLAMA SİSTEMİ (v2.1):[/]\n"
+        "  • ⏱️  30% Toplam Hız (🧠 Düşünme + ✍️ Yazma)\n"
         "  • 🏛️  30% Mimari & Temiz Kod (McCabe + PEP8 + Güvenlik)\n"
-        "  • ❌ 25% Hata/Deneme Oranı\n"
+        "  • ❌ 25% Hata/Deneme Oranı (her hata -10% ceza)\n"
         "  • 💎 15% Kütüphane Verimliliği\n\n"
         f"[bold bright_blue]📁 RAPORLAR:[/] [dim]{LOGS_DIR}/[/]\n"
         "  • JSON: report_YYYYMMDD_HHMMSS.json\n"
         "  • HTML: report_YYYYMMDD_HHMMSS.html (tarayıcıda açılabilir)\n\n"
-        "[dim italic]💡 İpucu: Süre AI signal dosyası oluşturduğunda başlar,\n"
-        "   kod dosyası kaydettiğinde durur. İnsan bekleme süresi sayılmaz![/]",
-        title=f"[bold]⚡ {APP_NAME} v{VERSION} — Kullanım Rehberi[/]",
+        "[dim italic]💡 İpucu: Düşünme süresi komut dağıtıldığı andan signal dosyasına kadar,\n"
+        "   yazma süresi signal dosyasından kod dosyasına kadar ölçülür.[/]",
+        title=f"[bold]⚡ {APP_NAME} v{VERSION} — Total Performance Rehberi[/]",
         border_style="bright_green",
         padding=(1, 2),
     ))
@@ -132,14 +131,14 @@ def cmd_run(args):
     # ── 2. SIGNAL TRIGGER + TELEMETRİ BİLGİ ────────────────────
     console.print(Panel(
         "👁️  Dosya izleme + telemetri başlatılıyor...\n\n"
-        "   📋 [bold]AI Görev Protokolü:[/]\n"
-        f"   [bright_cyan]1.[/] Klasöre [bold]{START_SIGNAL_FILE}[/] oluştur → kronometre başlar\n"
-        "   [bright_cyan]2.[/] Kodu yaz ve klasöre kaydet → kronometre durur\n"
+        "   📋 [bold]AI Görev Protokolü (Total Performance):[/]\n"
+        f"   [bright_cyan]1.[/] Klasöre [bold]{START_SIGNAL_FILE}[/] oluştur → 🧠 düşünme biter, ✍️ yazma başlar\n"
+        "   [bright_cyan]2.[/] Kodu yaz ve klasöre kaydet → ✍️ yazma durur\n"
         f"   [bright_cyan]3.[/] İşlem bittikten sonra [bold]{START_SIGNAL_FILE}[/] sil\n\n"
         f"   ⏰ Timeout: {timeout}sn\n"
-        "   📊 Puanlama: 30% Hız + 30% Mimari + 25% Hata/Deneme + 15% Kütüphane\n"
+        "   📊 Puanlama: 🧠+✍️ = ⏱️ Toplam Hız 30% + Mimari 30% + Hata 25% + Kütüphane 15%\n"
         "   🔬 Derin Analiz: McCabe + PEP8 + Güvenlik Taraması",
-        title="[bold]2 · Signal Trigger + Telemetri İzleme[/]",
+        title="[bold]2 · Total Performance İzleme (Thinking + Writing)[/]",
         border_style="bright_yellow",
     ))
     console.print()

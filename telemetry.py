@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Black Box Deep Analytics — Telemetry Engine v2.0
+Black Box Deep Analytics — Telemetry Engine v2.1 (Total Performance)
 AI araçlarının her save/edit işlemini izler.
+Düşünme süresi (thinking_time) ve yazma süresi (writing_time) takibi.
 Deneme sayısı, hata sayısı ve olay loglarını tutar.
 """
 
@@ -22,10 +23,12 @@ class TelemetryTracker:
     Bir hedef klasör için dosya değişiklik telemetrisini takip eder.
 
     Attributes:
-        save_count:  Toplam dosya kaydetme/oluşturma sayısı
-        retry_count: start_signal.json tekrar oluşturulma sayısı (ilkinden sonra)
-        error_count: Tespit edilen hata sayısı (dosya silinip yeniden yazılması vb.)
-        events_log:  Kronolojik olay kayıtları
+        save_count:    Toplam dosya kaydetme/oluşturma sayısı
+        retry_count:   start_signal.json tekrar oluşturulma sayısı (ilkinden sonra)
+        error_count:   Tespit edilen hata sayısı (dosya silinip yeniden yazılması vb.)
+        thinking_time: Global start → signal arası süre (saniye)
+        writing_time:  Signal → kod tamamlanma arası süre (saniye)
+        events_log:    Kronolojik olay kayıtları
     """
 
     def __init__(self, tool_name: str):
@@ -33,21 +36,42 @@ class TelemetryTracker:
         self.save_count = 0
         self.retry_count = 0
         self.error_count = 0
+        self.thinking_time = None
+        self.writing_time = None
         self.events_log = []
         self._signal_seen = False
+        self._signal_time = None
         self._known_files = {}  # path → son modify zamanı
         self._lock = threading.Lock()
 
-    def record_signal(self):
-        """start_signal.json olayını kaydet."""
+    def record_signal(self, global_start: float):
+        """
+        start_signal.json olayını kaydet.
+        thinking_time = signal_time - global_start
+        """
         with self._lock:
+            now = time.time()
             if self._signal_seen:
                 self.retry_count += 1
                 self._log_event("retry", "start_signal.json tekrar oluşturuldu")
                 logger.info("%s: 🔄 Retry algılandı (toplam: %d)", self.tool_name, self.retry_count)
             else:
                 self._signal_seen = True
-                self._log_event("signal", "start_signal.json ilk kez alındı")
+                self._signal_time = now
+                self.thinking_time = round(now - global_start, 3)
+                self._log_event("signal", f"start_signal.json ilk kez alındı (düşünme: {self.thinking_time:.3f}s)")
+                logger.info("%s: 🧠 Düşünme süresi: %.3fs", self.tool_name, self.thinking_time)
+
+    def record_completion(self, signal_time: float):
+        """
+        Kod dosyası tamamlandığında çağrılır.
+        writing_time = end_time - signal_time
+        """
+        with self._lock:
+            now = time.time()
+            self.writing_time = round(now - signal_time, 3)
+            self._log_event("completion", f"Kod tamamlandı (yazma: {self.writing_time:.3f}s)")
+            logger.info("%s: ✍️ Yazma süresi: %.3fs", self.tool_name, self.writing_time)
 
     def record_save(self, filepath: str):
         """Dosya kaydetme/oluşturma olayını kaydet."""
@@ -92,6 +116,8 @@ class TelemetryTracker:
                 "saves": self.save_count,
                 "retries": self.retry_count,
                 "errors": self.error_count,
+                "thinking_time": self.thinking_time,
+                "writing_time": self.writing_time,
                 "total_events": len(self.events_log),
                 "events_log": list(self.events_log),
             }

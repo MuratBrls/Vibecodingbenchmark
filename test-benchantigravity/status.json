@@ -1,16 +1,21 @@
 {
   "status": "completed",
-  "signal_time": 1771251309.0676012,
-  "end_time": 1771251363.1925955,
-  "net_execution_time": 54.125,
-  "gross_time": 89.016,
+  "signal_time": 1771320530.0558968,
+  "end_time": 1771320583.8419166,
+  "thinking_time": 8.059,
+  "writing_time": 53.786,
+  "total_time": 61.845,
+  "net_execution_time": 53.786,
+  "gross_time": 61.845,
   "tool": "Antigravity",
   "detected_files": [
-    "calculator.py"
+    "media_lib.py"
   ],
   "telemetry": {
     "saves": 1,
-    "retries": 3,
-    "errors": 0
+    "retries": 2,
+    "errors": 0,
+    "thinking_time": 8.059,
+    "writing_time": 53.786
   }
 }

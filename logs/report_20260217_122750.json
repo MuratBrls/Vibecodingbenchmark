@@ -1,0 +1,99 @@
+{
+  "timestamp": "20260217_122750",
+  "version": "2.1",
+  "prompt": "Kendi kendini organize eden, OOP mimarili bir Medya Kütüphanesi yaz.",
+  "log_file": "C:\\Users\\egule\\Documents\\github\\Vibecodingbenchmark\\logs\\vibebench_20260217_122545.log",
+  "weights": {
+    "speed": 0.3,
+    "architecture": 0.3,
+    "error_ratio": 0.25,
+    "libraries": 0.15
+  },
+  "results": {
+    "Antigravity": {
+      "rank": 2,
+      "total_score": 75.3,
+      "speed_score": 67.8,
+      "arch_score": 100.0,
+      "error_ratio_score": 40.0,
+      "library_score": 100.0,
+      "thinking_time": 19.25,
+      "writing_time": 64.042,
+      "total_time": 83.292,
+      "execution_time": 64.042,
+      "line_count": 445,
+      "file_size_bytes": 18194,
+      "status": "completed",
+      "telemetry": {
+        "saves": 4,
+        "retries": 3,
+        "errors": 3,
+        "thinking_time": 19.25,
+        "writing_time": 64.042
+      },
+      "pro_analysis": {
+        "mccabe_avg": 2.77,
+        "pep8_compliance": 100.0,
+        "security_count": 0,
+        "clean_code_score": 100.0
+      }
+    },
+    "Cursor": {
+      "rank": 1,
+      "total_score": 92.1,
+      "speed_score": 100.0,
+      "arch_score": 98.6,
+      "error_ratio_score": 70.0,
+      "library_score": 100.0,
+      "thinking_time": 33.253,
+      "writing_time": 27.251,
+      "total_time": 60.504,
+      "execution_time": 27.251,
+      "line_count": 308,
+      "file_size_bytes": 10256,
+      "status": "completed",
+      "telemetry": {
+        "saves": 2,
+        "retries": 2,
+        "errors": 1,
+        "thinking_time": 33.253,
+        "writing_time": 27.251
+      },
+      "pro_analysis": {
+        "mccabe_avg": 3.93,
+        "pep8_compliance": 99.7,
+        "security_count": 0,
+        "clean_code_score": 96.6
+      }
+    },
+    "Windsurf": {
+      "rank": 3,
+      "total_score": 64.9,
+      "speed_score": 10.0,
+      "arch_score": 98.0,
+      "error_ratio_score": 70.0,
+      "library_score": 100.0,
+      "thinking_time": 124.232,
+      "writing_time": 0.008,
+      "total_time": 124.24,
+      "execution_time": 0.008,
+      "line_count": 427,
+      "file_size_bytes": 15146,
+      "status": "completed",
+      "telemetry": {
+        "saves": 2,
+        "retries": 2,
+        "errors": 1,
+        "thinking_time": 124.232,
+        "writing_time": 0.008
+      },
+      "pro_analysis": {
+        "mccabe_avg": 2.36,
+        "pep8_compliance": 85.5,
+        "security_count": 0,
+        "clean_code_score": 94.9
+      }
+    }
+  },
+  "winner": "Cursor"
+}

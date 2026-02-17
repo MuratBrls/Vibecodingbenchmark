@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Black Box Deep Analytics — HTML Report Generator v2.0
+Black Box Deep Analytics — HTML Report Generator v2.1 (Total Performance)
 Benchmark bitiminde logs/ altına detaylı, grafikli HTML raporu üretir.
 Pure HTML + inline CSS + inline SVG charts — dış bağımlılık yok.
 """
@@ -61,6 +61,14 @@ def _tool_card(tool_name: str, data: dict, telemetry: dict) -> str:
     et = data.get("execution_time")
     et_str = f"{et:.3f}s" if et is not None else "N/A"
 
+    # v2.1: thinking & writing times
+    tt = data.get("thinking_time")
+    wt = data.get("writing_time")
+    total_t = data.get("total_time")
+    tt_str = f"{tt:.3f}s" if tt is not None else "N/A"
+    wt_str = f"{wt:.3f}s" if wt is not None else "N/A"
+    total_t_str = f"{total_t:.3f}s" if total_t is not None else "N/A"
+
     design = data.get("design", {})
     arch = design.get("architecture", "N/A")
     libs = design.get("all_imports", [])
@@ -89,8 +97,16 @@ def _tool_card(tool_name: str, data: dict, telemetry: dict) -> str:
         </div>
         <div class="card-grid">
             <div class="metric">
-                <div class="metric-label">⏱️ Net Süre</div>
-                <div class="metric-value">{et_str}</div>
+                <div class="metric-label">🧠 Düşünme</div>
+                <div class="metric-value">{tt_str}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">✍️ Yazma</div>
+                <div class="metric-value">{wt_str}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">⏱️ Toplam Süre</div>
+                <div class="metric-value">{total_t_str}</div>
             </div>
             <div class="metric">
                 <div class="metric-label">🏛️ Mimari</div>
@@ -180,13 +196,17 @@ def generate_html_report(scores: dict, prompt_text: str, telemetry_data: dict) -
     winner_html = ""
     if winner:
         wd = scores[winner]
-        et = wd.get("execution_time")
-        et_str = f"{et:.3f}s" if et is not None else "N/A"
+        tt = wd.get("thinking_time")
+        wt = wd.get("writing_time")
+        total_t = wd.get("total_time")
+        tt_str = f"{tt:.3f}s" if tt is not None else "N/A"
+        wt_str = f"{wt:.3f}s" if wt is not None else "N/A"
+        total_t_str = f"{total_t:.3f}s" if total_t is not None else "N/A"
         winner_html = f"""
         <div class="winner-banner">
             <div class="winner-icon">🏆</div>
             <div class="winner-text">KAZANAN: {html.escape(winner)}</div>
-            <div class="winner-detail">Net Süre: {et_str} • Skor: {wd.get('total_score', 0):.1f}</div>
+            <div class="winner-detail">🧠 {tt_str} + ✍️ {wt_str} = ⏱️ {total_t_str} • Skor: {wd.get('total_score', 0):.1f}</div>
         </div>
         """
 
@@ -390,7 +410,7 @@ def generate_html_report(scores: dict, prompt_text: str, telemetry_data: dict) -
     <div class="container">
         <div class="header">
             <h1>⚡ {APP_NAME}</h1>
-            <div class="version">v{VERSION} — Multi-AI Coding Benchmark</div>
+            <div class="version">v{VERSION} — Total Performance Multi-AI Benchmark</div>
             <div class="timestamp">📅 {time.strftime("%Y-%m-%d %H:%M:%S")}</div>
         </div>
 
@@ -402,9 +422,9 @@ def generate_html_report(scores: dict, prompt_text: str, telemetry_data: dict) -
         {winner_html}
 
         <div class="weights">
-            <span class="weight-chip">⏱️ Hız %30</span>
+            <span class="weight-chip">⏱️ Toplam Hız %30 (🧠+✍️)</span>
             <span class="weight-chip">🏛️ Mimari %30</span>
-            <span class="weight-chip">❌ Hata/Deneme %25</span>
+            <span class="weight-chip">❌ Hata %25 (-10%/hata)</span>
             <span class="weight-chip">💎 Kütüphane %15</span>
         </div>
 

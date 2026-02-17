@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Black Box Deep Analytics — Live Dashboard v2.0
-Canlı izleme (DENEME + HATA sütunları) + genişletilmiş final skor tablosu.
+Black Box Deep Analytics — Live Dashboard v2.1 (Total Performance)
+Canlı izleme (DÜŞÜNME + YAZMA sütunları) + genişletilmiş final skor tablosu.
 """
 
 import os
@@ -53,30 +53,45 @@ def build_live_table(handlers: dict, start_time: float) -> Table:
     table.add_column("🔧 ARAÇ", style="bold", justify="center", min_width=14)
     table.add_column("🟢 SİNYAL", justify="center", min_width=12)
     table.add_column("📊 DURUM", justify="center", min_width=16)
-    table.add_column("⏱️ NET SÜRE", justify="center", min_width=12)
+    table.add_column("🧠 DÜŞÜNME", justify="center", min_width=12)
+    table.add_column("✍️ YAZMA", justify="center", min_width=12)
+    table.add_column("⏱️ TOPLAM", justify="center", min_width=12)
     table.add_column("🔄 DENEME", justify="center", min_width=10)
     table.add_column("❌ HATA", justify="center", min_width=8)
     table.add_column("📁 DOSYA", justify="left", min_width=22)
 
     for tool_name, h in handlers.items():
+        now = time.time()
+
         # Sinyal durumu
         if h.signal_received:
             signal = Text("✅ Alındı", style="bright_green")
         else:
             signal = Text("⏳ Bekleniyor", style="dim yellow")
 
-        # Ana durum
+        # Düşünme süresi (canlı veya sabit)
+        if h.signal_received and h.signal_time:
+            thinking = Text(_fmt(h.signal_time - h.global_start), style="bold bright_magenta")
+        else:
+            # Henüz signal gelmedi → canlı sayaç
+            thinking = Text(_fmt(now - h.global_start), style="bright_magenta blink")
+
+        # Ana durum + yazma süresi
         if h.completed:
             status = Text("✅ BİTTİ", style="bold bright_green")
-            net = Text(_fmt(h.net_execution_time), style="bold bright_green")
+            writing = Text(_fmt(h.writing_time), style="bold bright_cyan")
+            total = Text(_fmt(h.total_time), style="bold bright_green")
             files = ", ".join(os.path.basename(f) for f in h.detected_files) or "—"
         elif h.signal_received:
             status = Text("✍️ Yazıyor...", style="bright_cyan blink")
-            net = Text(_fmt(time.time() - h.signal_time), style="bright_cyan")
+            writing = Text(_fmt(now - h.signal_time), style="bright_cyan blink")
+            total_val = (h.signal_time - h.global_start) + (now - h.signal_time)
+            total = Text(_fmt(total_val), style="bright_yellow")
             files = "—"
         else:
-            status = Text("⏳ Bekliyor...", style="bright_yellow")
-            net = Text("—", style="dim")
+            status = Text("🧠 Düşünüyor...", style="bright_magenta blink")
+            writing = Text("—", style="dim")
+            total = Text(_fmt(now - h.global_start), style="dim yellow")
             files = "—"
 
         # Telemetri verileri
@@ -89,7 +104,8 @@ def build_live_table(handlers: dict, start_time: float) -> Table:
 
         table.add_row(
             Text(tool_name, style="bold bright_cyan"),
-            signal, status, net,
+            signal, status,
+            thinking, writing, total,
             retry_text, error_text,
             Text(files[:50], style="dim"),
         )
@@ -111,6 +127,9 @@ def build_score_table(scores: dict) -> Table:
     )
     table.add_column("🏅", justify="center", width=6)
     table.add_column("🔧 ARAÇ", style="bold", justify="center", min_width=14)
+    table.add_column("🧠 DÜŞÜNME", justify="center", min_width=12)
+    table.add_column("✍️ YAZMA", justify="center", min_width=12)
+    table.add_column("⏱️ TOPLAM", justify="center", min_width=12)
     table.add_column("⚡ HIZ", justify="center", min_width=10)
     table.add_column("🏛️ MİMARİ", justify="center", min_width=14)
     table.add_column("❌ HATA/DENEME", justify="center", min_width=14)
@@ -123,12 +142,23 @@ def build_score_table(scores: dict) -> Table:
         rank = d["rank"]
         is_winner = rank == 1
 
-        # Hız
-        et = d.get("execution_time")
-        if et is not None:
-            spd = Text(f"{_fmt(et)} ({d['speed_score']:.0f})", style="bold bright_green" if is_winner else "bright_white")
+        # Düşünme süresi
+        tt = d.get("thinking_time")
+        thinking_text = Text(_fmt(tt), style="bright_magenta" if tt is not None else "dim")
+
+        # Yazma süresi
+        wt = d.get("writing_time")
+        writing_text = Text(_fmt(wt), style="bright_cyan" if wt is not None else "dim")
+
+        # Toplam süre
+        total_t = d.get("total_time")
+        if total_t is not None:
+            total_time_text = Text(_fmt(total_t), style="bold bright_green" if is_winner else "bright_white")
         else:
-            spd = Text("— (0)", style="dim")
+            total_time_text = Text("—", style="dim")
+
+        # Hız skoru
+        spd = Text(f"{d['speed_score']:.0f}", style="bold bright_green" if is_winner else "bright_white")
 
         # Mimari & Temiz Kod
         design = d.get("design", {})
@@ -151,13 +181,14 @@ def build_score_table(scores: dict) -> Table:
         lib_score = d.get("library_score", 0)
         lib_text = Text(f"{len(libs)} adet ({lib_score:.0f})", style="bright_cyan")
 
-        # Toplam
+        # Toplam skor
         total = d.get("total_score", 0)
         total_text = Text(f"{total:.1f}", style="bold bright_yellow" if is_winner else "bright_white")
 
         table.add_row(
             _rank_text(rank),
             Text(tool_name, style="bold bright_cyan" if is_winner else "bright_white"),
+            thinking_text, writing_text, total_time_text,
             spd, arch_text, err_text, lib_text, total_text,
         )
 
@@ -165,7 +196,7 @@ def build_score_table(scores: dict) -> Table:
 
 
 def build_detail_panel(scores: dict) -> Panel:
-    """Detaylı analiz paneli — mimari, kütüphaneler, temiz kod."""
+    """Detaylı analiz paneli — mimari, kütüphaneler, temiz kod, süre detayları."""
     lines = []
     for tool_name, d in sorted(scores.items(), key=lambda x: x[1]["rank"]):
         design = d.get("design", {})
@@ -176,7 +207,12 @@ def build_detail_panel(scores: dict) -> Panel:
         classes = design.get("total_classes", 0)
         depth = design.get("max_loop_depth", 0)
 
+        tt = d.get("thinking_time")
+        wt = d.get("writing_time")
+        tot = d.get("total_time")
+
         lines.append(f"[bold bright_cyan]{tool_name}[/]")
+        lines.append(f"  🧠 Düşünme: {_fmt(tt)} | ✍️ Yazma: {_fmt(wt)} | ⏱️ Toplam: {_fmt(tot)}")
         lines.append(f"  📦 Kütüphaneler: {', '.join(libs) if libs else '—'}")
         lines.append(f"  🔧 {funcs} fonksiyon, {classes} sınıf, döngü derinliği: {depth}")
         lines.append(f"  🧹 Temiz Kod: {pro.get('clean_code_score', 0):.1f} | McCabe: {pro.get('mccabe_avg', 0):.1f} | PEP8: {pro.get('pep8_compliance', 0):.0f}% | Güvenlik: {pro.get('security_count', 0)} sorun")
@@ -201,8 +237,8 @@ def print_banner():
  ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝╚═╝  ╚═╝
 """, style="bold bright_cyan")
     console.print(banner)
-    console.print(Align.center(Text(f"⚡ {APP_NAME}  v{VERSION}  (Signal Trigger + Deep Analytics)", style="bold bright_magenta")))
-    console.print(Align.center(Text("30% Hız · 30% Mimari · 25% Hata/Deneme · 15% Kütüphane", style="dim bright_white")))
+    console.print(Align.center(Text(f"⚡ {APP_NAME}  v{VERSION}  (Total Performance — Düşünme + Yazma Analizi)", style="bold bright_magenta")))
+    console.print(Align.center(Text("🧠 Düşünme + ✍️ Yazma = ⏱️ Toplam  •  30% Hız · 30% Mimari · 25% Hata · 15% Kütüphane", style="dim bright_white")))
     console.print()
 
 
@@ -211,9 +247,12 @@ def print_winner(scores: dict):
     if completed:
         winner = min(completed, key=lambda k: scores[k]["rank"])
         d = scores[winner]
+        tt = d.get("thinking_time")
+        wt = d.get("writing_time")
+        tot = d.get("total_time")
         console.print(Panel(
             Align.center(Text(
-                f"🏆 KAZANAN: {winner}  •  Net Süre: {_fmt(d['execution_time'])}  •  Skor: {d['total_score']:.1f}",
+                f"🏆 KAZANAN: {winner}  •  🧠 {_fmt(tt)} + ✍️ {_fmt(wt)} = ⏱️ {_fmt(tot)}  •  Skor: {d['total_score']:.1f}",
                 style="bold bright_yellow"
             )),
             border_style="bright_yellow", box=box.DOUBLE,

@@ -1,1 +1,1 @@
-Gelişmiş, Nesne Yönelimli bir hesap makinesi yaz
+Kendi kendini organize eden, OOP mimarili bir Medya Kütüphanesi yaz.
