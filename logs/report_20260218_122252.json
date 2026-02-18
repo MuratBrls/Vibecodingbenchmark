@@ -1,0 +1,123 @@
+{
+  "timestamp": "20260218_122252",
+  "version": "2.2-local",
+  "local_mode": true,
+  "prompt": "Lokal dosya yönetim sistemini optimize eden OOP bir sınıf yaz",
+  "log_file": "C:\\Users\\egule\\Documents\\github\\Vibecodingbenchmark\\logs\\vibebench_20260218_122158.log",
+  "weights": {
+    "speed": 0.3,
+    "architecture": 0.3,
+    "error_ratio": 0.25,
+    "libraries": 0.15
+  },
+  "results": {
+    "Antigravity": {
+      "rank": 1,
+      "total_score": 78.6,
+      "speed_score": 100.0,
+      "arch_score": 98.6,
+      "error_ratio_score": 40.0,
+      "library_score": 60,
+      "thinking_time": 27.347176,
+      "writing_time": 2.014674,
+      "total_time": 29.36185,
+      "execution_time": 2.014674,
+      "line_count": 134,
+      "file_size_bytes": 4876,
+      "status": "completed",
+      "telemetry": {
+        "saves": 4,
+        "retries": 3,
+        "errors": 3,
+        "thinking_time": 27.347038,
+        "writing_time": 2.014676
+      },
+      "resource_usage": {
+        "avg_cpu": 1.2,
+        "peak_cpu": 14.3,
+        "avg_ram_mb": 27.9,
+        "peak_ram_mb": 28.2
+      },
+      "pro_analysis": {
+        "mccabe_avg": 3.25,
+        "pep8_compliance": 92.5,
+        "security_count": 0,
+        "clean_code_score": 96.5
+      }
+    },
+    "Cursor": {
+      "rank": 2,
+      "total_score": 65.4,
+      "speed_score": 19.0,
+      "arch_score": 98.7,
+      "error_ratio_score": 70.0,
+      "library_score": 84,
+      "thinking_time": 27.633961,
+      "writing_time": 23.962687,
+      "total_time": 51.596648,
+      "execution_time": 23.962687,
+      "line_count": 216,
+      "file_size_bytes": 7076,
+      "status": "completed",
+      "telemetry": {
+        "saves": 2,
+        "retries": 2,
+        "errors": 1,
+        "thinking_time": 27.633796,
+        "writing_time": 23.962689
+      },
+      "resource_usage": {
+        "avg_cpu": 1.2,
+        "peak_cpu": 14.3,
+        "avg_ram_mb": 27.9,
+        "peak_ram_mb": 28.2
+      },
+      "pro_analysis": {
+        "mccabe_avg": 3.83,
+        "pep8_compliance": 99.1,
+        "security_count": 0,
+        "clean_code_score": 96.8
+      }
+    },
+    "Windsurf": {
+      "rank": 3,
+      "total_score": 64.2,
+      "speed_score": 10.0,
+      "arch_score": 95.5,
+      "error_ratio_score": 70.0,
+      "library_score": 100.0,
+      "thinking_time": 54.072969,
+      "writing_time": 0.00718,
+      "total_time": 54.080149,
+      "execution_time": 0.00718,
+      "line_count": 453,
+      "file_size_bytes": 16666,
+      "status": "completed",
+      "telemetry": {
+        "saves": 2,
+        "retries": 2,
+        "errors": 1,
+        "thinking_time": 54.072754,
+        "writing_time": 0.007182
+      },
+      "resource_usage": {
+        "avg_cpu": 1.2,
+        "peak_cpu": 14.3,
+        "avg_ram_mb": 27.9,
+        "peak_ram_mb": 28.2
+      },
+      "pro_analysis": {
+        "mccabe_avg": 4.47,
+        "pep8_compliance": 82.6,
+        "security_count": 0,
+        "clean_code_score": 88.8
+      }
+    }
+  },
+  "local_errors": {
+    "total_errors": 0,
+    "error_types": {},
+    "errors": []
+  },
+  "winner": "Antigravity"
+}

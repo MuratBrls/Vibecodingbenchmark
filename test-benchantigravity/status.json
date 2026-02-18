@@ -1,21 +1,26 @@
 {
   "status": "completed",
-  "signal_time": 1771320530.0558968,
-  "end_time": 1771320583.8419166,
-  "thinking_time": 8.059,
-  "writing_time": 53.786,
-  "total_time": 61.845,
-  "net_execution_time": 53.786,
-  "gross_time": 61.845,
+  "local_mode": true,
+  "signal_time": 418272.8444548,
+  "end_time": 418274.8591292,
+  "thinking_time": 27.347176,
+  "writing_time": 2.014674,
+  "total_time": 29.36185,
+  "net_execution_time": 2.014674,
+  "gross_time": 29.36185,
   "tool": "Antigravity",
   "detected_files": [
-    "media_lib.py"
+    "local_optimizer.py"
   ],
   "telemetry": {
     "saves": 1,
-    "retries": 2,
+    "retries": 3,
     "errors": 0,
-    "thinking_time": 8.059,
-    "writing_time": 53.786
+    "thinking_time": 27.347038,
+    "writing_time": 2.014676,
+    "avg_cpu": 1.6,
+    "peak_cpu": 14.3,
+    "avg_ram_mb": 27.7,
+    "peak_ram_mb": 27.9
   }
 }

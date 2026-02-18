@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Black Box Deep Analytics — Live Dashboard v2.1 (Total Performance)
-Canlı izleme (DÜŞÜNME + YAZMA sütunları) + genişletilmiş final skor tablosu.
+Black Box Deep Analytics — Live Dashboard v2.2 (Lokal On-Premise)
+Canlı izleme (DÜŞÜNME + YAZMA + CPU + RAM sütunları) + genişletilmiş final skor tablosu.
 """
 
 import os
@@ -16,7 +16,7 @@ from rich.align import Align
 from rich.columns import Columns
 from rich import box
 
-from config import TARGETS, VERSION, APP_NAME
+from config import TARGETS, VERSION, APP_NAME, LOCAL_MODE
 
 console = Console()
 
@@ -41,9 +41,10 @@ def _rank_text(rank: int) -> Text:
 # ═══════════════════════════════════════════════════════════════════
 
 def build_live_table(handlers: dict, start_time: float) -> Table:
-    elapsed = time.time() - start_time
+    elapsed = time.perf_counter() - start_time
+    mode_label = "🏠 LOKAL" if LOCAL_MODE else "☁️ REMOTE"
     table = Table(
-        title=f"🔴 CANLI İZLEME  •  {_fmt(elapsed)}",
+        title=f"🔴 CANLI İZLEME {mode_label}  •  {_fmt(elapsed)}",
         box=box.ROUNDED, show_lines=True,
         title_style="bold blink bright_red",
         border_style="bright_magenta",
@@ -56,12 +57,14 @@ def build_live_table(handlers: dict, start_time: float) -> Table:
     table.add_column("🧠 DÜŞÜNME", justify="center", min_width=12)
     table.add_column("✍️ YAZMA", justify="center", min_width=12)
     table.add_column("⏱️ TOPLAM", justify="center", min_width=12)
-    table.add_column("🔄 DENEME", justify="center", min_width=10)
+    table.add_column("�️ CPU%", justify="center", min_width=8)
+    table.add_column("🧮 RAM", justify="center", min_width=10)
+    table.add_column("�🔄 DENEME", justify="center", min_width=10)
     table.add_column("❌ HATA", justify="center", min_width=8)
     table.add_column("📁 DOSYA", justify="left", min_width=22)
 
     for tool_name, h in handlers.items():
-        now = time.time()
+        now = time.perf_counter()
 
         # Sinyal durumu
         if h.signal_received:
@@ -99,6 +102,14 @@ def build_live_table(handlers: dict, start_time: float) -> Table:
         retries = tele.get("retries", 0)
         errors = tele.get("errors", 0)
 
+        # CPU ve RAM (canlı)
+        avg_cpu = tele.get("avg_cpu", 0.0)
+        avg_ram = tele.get("avg_ram_mb", 0.0)
+        cpu_style = "bold bright_red" if avg_cpu > 80 else ("bright_yellow" if avg_cpu > 50 else "bright_green")
+        ram_style = "bold bright_red" if avg_ram > 500 else ("bright_yellow" if avg_ram > 200 else "bright_green")
+        cpu_text = Text(f"{avg_cpu:.0f}%", style=cpu_style) if avg_cpu > 0 else Text("—", style="dim")
+        ram_text = Text(f"{avg_ram:.0f}MB", style=ram_style) if avg_ram > 0 else Text("—", style="dim")
+
         retry_text = Text(str(retries), style="bright_yellow" if retries > 0 else "dim green")
         error_text = Text(str(errors), style="bold bright_red" if errors > 0 else "dim green")
 
@@ -106,6 +117,7 @@ def build_live_table(handlers: dict, start_time: float) -> Table:
             Text(tool_name, style="bold bright_cyan"),
             signal, status,
             thinking, writing, total,
+            cpu_text, ram_text,
             retry_text, error_text,
             Text(files[:50], style="dim"),
         )
@@ -118,7 +130,7 @@ def build_live_table(handlers: dict, start_time: float) -> Table:
 
 def build_score_table(scores: dict) -> Table:
     table = Table(
-        title="🏆 FİNAL SKOR TABLOSU",
+        title="🏆 FİNAL SKOR TABLOSU — LOKAL MOD",
         box=box.HEAVY_EDGE, show_lines=True,
         title_style="bold bright_yellow",
         border_style="bright_blue",
@@ -132,6 +144,8 @@ def build_score_table(scores: dict) -> Table:
     table.add_column("⏱️ TOPLAM", justify="center", min_width=12)
     table.add_column("⚡ HIZ", justify="center", min_width=10)
     table.add_column("🏛️ MİMARİ", justify="center", min_width=14)
+    table.add_column("🖥️ CPU%", justify="center", min_width=8)
+    table.add_column("🧮 RAM", justify="center", min_width=10)
     table.add_column("❌ HATA/DENEME", justify="center", min_width=14)
     table.add_column("📦 KÜTÜPHANE", justify="center", min_width=12)
     table.add_column("⭐ TOPLAM", justify="center", min_width=10)
@@ -168,9 +182,15 @@ def build_score_table(scores: dict) -> Table:
         arch_text = Text(f"{arch_icons.get(arch, '?')} {arch} ({arch_score:.0f})",
                          style="bright_green" if arch == "OOP" else ("bright_cyan" if arch == "Functional" else "dim"))
 
+        # CPU ve RAM (final)
+        tele = d.get("telemetry", {})
+        avg_cpu = tele.get("avg_cpu", 0.0)
+        peak_ram = tele.get("peak_ram_mb", 0.0)
+        cpu_text = Text(f"{avg_cpu:.0f}%", style="bright_green") if avg_cpu > 0 else Text("—", style="dim")
+        ram_text = Text(f"{peak_ram:.0f}MB", style="bright_cyan") if peak_ram > 0 else Text("—", style="dim")
+
         # Hata/Deneme
         err_score = d.get("error_ratio_score", 0)
-        tele = d.get("telemetry", {})
         retries = tele.get("retries", 0)
         errors = tele.get("errors", 0)
         err_style = "bright_green" if err_score >= 80 else ("bright_yellow" if err_score >= 50 else "bright_red")
@@ -189,14 +209,16 @@ def build_score_table(scores: dict) -> Table:
             _rank_text(rank),
             Text(tool_name, style="bold bright_cyan" if is_winner else "bright_white"),
             thinking_text, writing_text, total_time_text,
-            spd, arch_text, err_text, lib_text, total_text,
+            spd, arch_text,
+            cpu_text, ram_text,
+            err_text, lib_text, total_text,
         )
 
     return table
 
 
 def build_detail_panel(scores: dict) -> Panel:
-    """Detaylı analiz paneli — mimari, kütüphaneler, temiz kod, süre detayları."""
+    """Detaylı analiz paneli — mimari, kütüphaneler, temiz kod, süre detayları, kaynak kullanımı."""
     lines = []
     for tool_name, d in sorted(scores.items(), key=lambda x: x[1]["rank"]):
         design = d.get("design", {})
@@ -211,8 +233,15 @@ def build_detail_panel(scores: dict) -> Panel:
         wt = d.get("writing_time")
         tot = d.get("total_time")
 
+        # Kaynak kullanımı
+        avg_cpu = tele.get("avg_cpu", 0.0)
+        peak_cpu = tele.get("peak_cpu", 0.0)
+        avg_ram = tele.get("avg_ram_mb", 0.0)
+        peak_ram = tele.get("peak_ram_mb", 0.0)
+
         lines.append(f"[bold bright_cyan]{tool_name}[/]")
         lines.append(f"  🧠 Düşünme: {_fmt(tt)} | ✍️ Yazma: {_fmt(wt)} | ⏱️ Toplam: {_fmt(tot)}")
+        lines.append(f"  🖥️ CPU: ort {avg_cpu:.1f}% / zirve {peak_cpu:.1f}% | 🧮 RAM: ort {avg_ram:.0f}MB / zirve {peak_ram:.0f}MB")
         lines.append(f"  📦 Kütüphaneler: {', '.join(libs) if libs else '—'}")
         lines.append(f"  🔧 {funcs} fonksiyon, {classes} sınıf, döngü derinliği: {depth}")
         lines.append(f"  🧹 Temiz Kod: {pro.get('clean_code_score', 0):.1f} | McCabe: {pro.get('mccabe_avg', 0):.1f} | PEP8: {pro.get('pep8_compliance', 0):.0f}% | Güvenlik: {pro.get('security_count', 0)} sorun")
@@ -220,7 +249,7 @@ def build_detail_panel(scores: dict) -> Panel:
         lines.append("")
 
     content = "\n".join(lines).rstrip()
-    return Panel(content, title="[bold]📋 Detaylı Tasarım & Telemetri Analizi[/]", border_style="bright_blue", padding=(1, 2))
+    return Panel(content, title="[bold]📋 Detaylı Tasarım & Telemetri & Kaynak Analizi (Lokal)[/]", border_style="bright_blue", padding=(1, 2))
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -237,8 +266,9 @@ def print_banner():
  ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝╚═╝  ╚═╝
 """, style="bold bright_cyan")
     console.print(banner)
-    console.print(Align.center(Text(f"⚡ {APP_NAME}  v{VERSION}  (Total Performance — Düşünme + Yazma Analizi)", style="bold bright_magenta")))
-    console.print(Align.center(Text("🧠 Düşünme + ✍️ Yazma = ⏱️ Toplam  •  30% Hız · 30% Mimari · 25% Hata · 15% Kütüphane", style="dim bright_white")))
+    mode_str = "🏠 LOKAL ON-PREMISE" if LOCAL_MODE else "☁️ REMOTE"
+    console.print(Align.center(Text(f"⚡ {APP_NAME}  v{VERSION}  ({mode_str} — Sıfır Gecikme)", style="bold bright_magenta")))
+    console.print(Align.center(Text("🧠 Düşünme + ✍️ Yazma + 🖥️ CPU + 🧮 RAM  •  30% Hız · 30% Mimari · 25% Hata · 15% Kütüphane", style="dim bright_white")))
     console.print()
 
 
@@ -250,9 +280,13 @@ def print_winner(scores: dict):
         tt = d.get("thinking_time")
         wt = d.get("writing_time")
         tot = d.get("total_time")
+        tele = d.get("telemetry", {})
+        cpu = tele.get("avg_cpu", 0)
+        ram = tele.get("peak_ram_mb", 0)
         console.print(Panel(
             Align.center(Text(
-                f"🏆 KAZANAN: {winner}  •  🧠 {_fmt(tt)} + ✍️ {_fmt(wt)} = ⏱️ {_fmt(tot)}  •  Skor: {d['total_score']:.1f}",
+                f"🏆 KAZANAN: {winner}  •  🧠 {_fmt(tt)} + ✍️ {_fmt(wt)} = ⏱️ {_fmt(tot)}  •  "
+                f"🖥️ {cpu:.0f}% CPU  🧮 {ram:.0f}MB RAM  •  Skor: {d['total_score']:.1f}",
                 style="bold bright_yellow"
             )),
             border_style="bright_yellow", box=box.DOUBLE,

@@ -1,0 +1,50 @@
+{
+  "timestamp": "20260218_113037",
+  "version": "2.2-local",
+  "local_mode": true,
+  "prompt": "Lokal dosya sistemini optimize eden OOP bir sınıf yaz",
+  "log_file": "C:\\Users\\egule\\Documents\\github\\Vibecodingbenchmark\\logs\\vibebench_20260218_113037.log",
+  "weights": {
+    "speed": 0.3,
+    "architecture": 0.3,
+    "error_ratio": 0.25,
+    "libraries": 0.15
+  },
+  "results": {},
+  "local_errors": {
+    "total_errors": 3,
+    "error_types": {
+      "AttributeError": 3
+    },
+    "errors": [
+      {
+        "timestamp": 1771403437.6218328,
+        "time_str": "2026-02-18 11:30:37",
+        "type": "AttributeError",
+        "message": "can't set attribute 'timeout'",
+        "filepath": "C:\\Users\\egule\\Documents\\github\\Vibecodingbenchmark\\test-benchantigravity",
+        "context": "observer başlatma",
+        "diagnosis": "ℹ️ Genel I/O hatası. Disk durumunu ve izinleri kontrol edin."
+      },
+      {
+        "timestamp": 1771403437.6218328,
+        "time_str": "2026-02-18 11:30:37",
+        "type": "AttributeError",
+        "message": "can't set attribute 'timeout'",
+        "filepath": "C:\\Users\\egule\\Documents\\github\\Vibecodingbenchmark\\test-benchcursor",
+        "context": "observer başlatma",
+        "diagnosis": "ℹ️ Genel I/O hatası. Disk durumunu ve izinleri kontrol edin."
+      },
+      {
+        "timestamp": 1771403437.6218328,
+        "time_str": "2026-02-18 11:30:37",
+        "type": "AttributeError",
+        "message": "can't set attribute 'timeout'",
+        "filepath": "C:\\Users\\egule\\Documents\\github\\Vibecodingbenchmark\\test-benchwindsurf",
+        "context": "observer başlatma",
+        "diagnosis": "ℹ️ Genel I/O hatası. Disk durumunu ve izinleri kontrol edin."
+      }
+    ]
+  },
+  "winner": null
+}

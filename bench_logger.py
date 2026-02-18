@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Black Box Deep Analytics — Logging & Final Report Module v2.0
+Black Box Deep Analytics — Logging & Final Report Module v2.2 (Lokal On-Premise)
 Tüm süreci logs/ altına kaydeder ve final raporu üretir.
+Kaynak kullanımı ve lokal hata verileri dahil.
 """
 
 import json
@@ -9,7 +10,7 @@ import os
 import time
 import logging
 
-from config import LOGS_DIR
+from config import LOGS_DIR, LOCAL_MODE
 
 logger = logging.getLogger("vibebench.logger")
 
@@ -46,7 +47,8 @@ def setup_logging() -> str:
     return log_file
 
 
-def save_final_report(scores: dict, prompt_text: str, log_file: str) -> str:
+def save_final_report(scores: dict, prompt_text: str, log_file: str,
+                      local_error_summary: dict = None) -> str:
     """
     Final raporu JSON olarak kaydeder.
 
@@ -59,7 +61,8 @@ def save_final_report(scores: dict, prompt_text: str, log_file: str) -> str:
 
         report = {
             "timestamp": timestamp,
-            "version": "2.1",
+            "version": "2.2-local",
+            "local_mode": LOCAL_MODE,
             "prompt": prompt_text[:500],
             "log_file": log_file,
             "weights": {
@@ -69,6 +72,7 @@ def save_final_report(scores: dict, prompt_text: str, log_file: str) -> str:
                 "libraries": 0.15,
             },
             "results": {},
+            "local_errors": local_error_summary or {"total_errors": 0},
         }
 
         for tool_name, data in scores.items():
@@ -94,6 +98,12 @@ def save_final_report(scores: dict, prompt_text: str, log_file: str) -> str:
                     "errors": tele.get("errors", 0),
                     "thinking_time": tele.get("thinking_time"),
                     "writing_time": tele.get("writing_time"),
+                },
+                "resource_usage": {
+                    "avg_cpu": tele.get("avg_cpu", 0.0),
+                    "peak_cpu": tele.get("peak_cpu", 0.0),
+                    "avg_ram_mb": tele.get("avg_ram_mb", 0.0),
+                    "peak_ram_mb": tele.get("peak_ram_mb", 0.0),
                 },
                 "pro_analysis": {
                     "mccabe_avg": pro.get("mccabe_avg", 0),

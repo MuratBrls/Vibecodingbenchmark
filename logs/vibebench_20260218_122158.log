@@ -1,0 +1,44 @@
+[12:21:58] INFO     vibebench.logger          │ VibeBench logging başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\logs\vibebench_20260218_122158.log
+[12:21:58] INFO     vibebench.main            │ Black Box Deep Analytics v2.2-local başlatıldı — LOKAL MOD — prompt: Lokal dosya yönetim sistemini optimize eden OOP bir sınıf yaz
+[12:21:58] INFO     vibebench.local_error     │ LocalErrorLogger başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\logs\local_errors.json
+[12:21:58] INFO     vibebench.main            │ LocalErrorLogger başlatıldı
+[12:21:58] INFO     vibebench.precheck        │ ✅ Antigravity: yazma izni OK — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchantigravity
+[12:21:58] INFO     vibebench.precheck        │ ✅ Cursor: yazma izni OK — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchcursor
+[12:21:58] INFO     vibebench.precheck        │ ✅ Windsurf: yazma izni OK — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchwindsurf
+[12:21:58] INFO     vibebench.distributor     │ Antigravity: task_input.txt dağıtıldı
+[12:21:58] INFO     vibebench.distributor     │ Cursor: task_input.txt dağıtıldı
+[12:21:58] INFO     vibebench.distributor     │ Windsurf: task_input.txt dağıtıldı
+[12:21:58] INFO     vibebench.telemetry       │ Antigravity: telemetry tracker oluşturuldu
+[12:21:58] INFO     vibebench.telemetry       │ Cursor: telemetry tracker oluşturuldu
+[12:21:58] INFO     vibebench.telemetry       │ Windsurf: telemetry tracker oluşturuldu
+[12:21:58] INFO     vibebench.telemetry       │ ResourceSampler başlatıldı (aralık: 1.0s)
+[12:21:58] INFO     vibebench.telemetry       │ ResourceSampler başlatıldı (aralık: 1.0s)
+[12:21:58] INFO     vibebench.telemetry       │ ResourceSampler başlatıldı (aralık: 1.0s)
+[12:21:58] INFO     vibebench.watcher         │ Antigravity: 🟢 gözlemci başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchantigravity (polling: 100ms)
+[12:21:58] INFO     vibebench.watcher         │ Cursor: 🟢 gözlemci başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchcursor (polling: 100ms)
+[12:21:58] INFO     vibebench.watcher         │ Windsurf: 🟢 gözlemci başlatıldı — C:\Users\egule\Documents\github\Vibecodingbenchmark\test-benchwindsurf (polling: 100ms)
+[12:22:25] INFO     vibebench.telemetry       │ Antigravity: 🧠 Düşünme süresi: 27.347s
+[12:22:25] INFO     vibebench.watcher         │ Antigravity: 🟢 start_signal.json alındı — kronometre başladı (düşünme: 27347.176ms)
+[12:22:25] INFO     vibebench.telemetry       │ Antigravity: 🔄 Retry algılandı (toplam: 1)
+[12:22:25] INFO     vibebench.telemetry       │ Antigravity: 🔄 Retry algılandı (toplam: 2)
+[12:22:25] INFO     vibebench.telemetry       │ Antigravity: 🔄 Retry algılandı (toplam: 3)
+[12:22:25] INFO     vibebench.telemetry       │ Cursor: 🧠 Düşünme süresi: 27.634s
+[12:22:25] INFO     vibebench.watcher         │ Cursor: 🟢 start_signal.json alındı — kronometre başladı (düşünme: 27633.961ms)
+[12:22:25] INFO     vibebench.telemetry       │ Cursor: 🔄 Retry algılandı (toplam: 1)
+[12:22:25] INFO     vibebench.telemetry       │ Cursor: 🔄 Retry algılandı (toplam: 2)
+[12:22:27] INFO     vibebench.telemetry       │ Antigravity: ✍️ Yazma süresi: 2.015s
+[12:22:27] INFO     vibebench.watcher         │ Antigravity: ✅ tamamlandı — local_optimizer.py (düşünme: 27347.176ms, yazma: 2014.674ms, toplam: 29361.850ms)
+[12:22:49] INFO     vibebench.telemetry       │ Cursor: ✍️ Yazma süresi: 23.963s
+[12:22:49] INFO     vibebench.watcher         │ Cursor: ✅ tamamlandı — local_optimizer.py (düşünme: 27633.961ms, yazma: 23962.687ms, toplam: 51596.649ms)
+[12:22:52] INFO     vibebench.telemetry       │ Windsurf: 🧠 Düşünme süresi: 54.073s
+[12:22:52] INFO     vibebench.watcher         │ Windsurf: 🟢 start_signal.json alındı — kronometre başladı (düşünme: 54072.969ms)
+[12:22:52] INFO     vibebench.telemetry       │ Windsurf: 🔄 Retry algılandı (toplam: 1)
+[12:22:52] INFO     vibebench.telemetry       │ Windsurf: 🔄 Retry algılandı (toplam: 2)
+[12:22:52] INFO     vibebench.telemetry       │ Windsurf: ✍️ Yazma süresi: 0.007s
+[12:22:52] INFO     vibebench.watcher         │ Windsurf: ✅ tamamlandı — file_scanner.py (düşünme: 54072.969ms, yazma: 7.180ms, toplam: 54080.149ms)
+[12:22:52] INFO     vibebench.telemetry       │ ResourceSampler durduruldu (toplam örnek: 49)
+[12:22:52] INFO     vibebench.telemetry       │ ResourceSampler durduruldu (toplam örnek: 49)
+[12:22:52] INFO     vibebench.telemetry       │ ResourceSampler durduruldu (toplam örnek: 49)
+[12:22:52] INFO     vibebench.logger          │ Final rapor kaydedildi: C:\Users\egule\Documents\github\Vibecodingbenchmark\logs\report_20260218_122252.json
+[12:22:52] INFO     vibebench.html_report     │ HTML rapor oluşturuldu: C:\Users\egule\Documents\github\Vibecodingbenchmark\logs\report_20260218_122252.html
+[12:22:52] INFO     vibebench.main            │ 🏆 KAZANAN: Antigravity (skor: 78.6, net süre: 2.015s)

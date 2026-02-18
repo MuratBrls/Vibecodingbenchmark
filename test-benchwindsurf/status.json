@@ -1,21 +1,26 @@
 {
   "status": "completed",
-  "signal_time": 1771320525.5350325,
-  "end_time": 1771320600.5868192,
-  "thinking_time": 3.538,
-  "writing_time": 75.052,
-  "total_time": 78.59,
-  "net_execution_time": 75.052,
-  "gross_time": 78.59,
+  "local_mode": true,
+  "signal_time": 418299.5702477,
+  "end_time": 418299.5774277,
+  "thinking_time": 54.072969,
+  "writing_time": 0.00718,
+  "total_time": 54.080149,
+  "net_execution_time": 0.00718,
+  "gross_time": 54.080149,
   "tool": "Windsurf",
   "detected_files": [
-    "main.py"
+    "file_scanner.py"
   ],
   "telemetry": {
     "saves": 1,
-    "retries": 5,
+    "retries": 2,
     "errors": 0,
-    "thinking_time": 3.538,
-    "writing_time": 75.052
+    "thinking_time": 54.072754,
+    "writing_time": 0.007182,
+    "avg_cpu": 1.2,
+    "peak_cpu": 14.3,
+    "avg_ram_mb": 27.9,
+    "peak_ram_mb": 28.2
   }
 }

@@ -1,1 +1,1 @@
-Kendi kendini organize eden, OOP mimarili bir Medya Kütüphanesi yaz.
+Lokal dosya yönetim sistemini optimize eden OOP bir sınıf yaz

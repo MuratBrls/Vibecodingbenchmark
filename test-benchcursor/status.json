@@ -1,21 +1,26 @@
 {
   "status": "completed",
-  "signal_time": 1771320536.018152,
-  "end_time": 1771320590.922969,
-  "thinking_time": 14.022,
-  "writing_time": 54.905,
-  "total_time": 68.927,
-  "net_execution_time": 54.905,
-  "gross_time": 68.927,
+  "local_mode": true,
+  "signal_time": 418273.1312401,
+  "end_time": 418297.0939274,
+  "thinking_time": 27.633961,
+  "writing_time": 23.962687,
+  "total_time": 51.596648,
+  "net_execution_time": 23.962687,
+  "gross_time": 51.596648,
   "tool": "Cursor",
   "detected_files": [
-    "media_lib.py"
+    "local_optimizer.py"
   ],
   "telemetry": {
     "saves": 1,
     "retries": 2,
     "errors": 0,
-    "thinking_time": 14.022,
-    "writing_time": 54.905
+    "thinking_time": 27.633796,
+    "writing_time": 23.962689,
+    "avg_cpu": 1.2,
+    "peak_cpu": 14.3,
+    "avg_ram_mb": 27.9,
+    "peak_ram_mb": 28.1
   }
 }

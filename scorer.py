@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Black Box Deep Analytics — Scoring Engine v2.1 (Total Performance)
+Black Box Deep Analytics — Scoring Engine v2.2 (Lokal On-Premise)
 Hız (thinking + writing) + Mimari & Temiz Kod + Hata/Deneme + Kütüphane puanlaması.
 Her hata/retry toplam skordan %10 ceza.
+Kaynak kullanımı (CPU/RAM) veri akışı dahil.
 """
 
 import logging
@@ -127,6 +128,7 @@ def calculate_scores(watcher_results: dict, telemetry_data: dict = None) -> dict
         pro = analyze_pro(tool_name)
 
         all_total_times.append(total_time)
+        tele = telemetry_data.get(tool_name, {})
         raw[tool_name] = {
             "execution_time": writing,  # geriye uyumluluk
             "thinking_time": thinking,
@@ -137,7 +139,12 @@ def calculate_scores(watcher_results: dict, telemetry_data: dict = None) -> dict
             "status": result.get("status", "unknown"),
             "design": design,
             "pro_analysis": pro,
-            "telemetry": telemetry_data.get(tool_name, {}),
+            "telemetry": tele,
+            # Kaynak kullanımı (psutil)
+            "avg_cpu": tele.get("avg_cpu", 0.0),
+            "peak_cpu": tele.get("peak_cpu", 0.0),
+            "avg_ram_mb": tele.get("avg_ram_mb", 0.0),
+            "peak_ram_mb": tele.get("peak_ram_mb", 0.0),
         }
 
     scores = {}
