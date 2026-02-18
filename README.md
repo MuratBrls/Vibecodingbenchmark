@@ -1,61 +1,91 @@
-# ⚡ VibeBench — Multi-AI Coding Benchmark
+# ⚡ VibeBench — Multi-AI Coding Benchmark (v2.2-local)
+
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)]()
+[![Status](https://img.shields.io/badge/Status-Active-brightgreen)]()
 
 **Black Box Deep Analytics Tool** for measuring AI coding performance in real-time.
-
-VibeBench, farklı yapay zeka kodlama asistanlarının (Antigravity, Cursor, Windsurf vb.) performansını gerçek zamanlı senaryolarda, objektif metriklerle karşılaştıran bir benchmark aracıdır.
-
----
-
-## 🎯 Amaç
-
-Yapay zeka modellerinin kod yazma yeteneklerini sadece "doğruluk" üzerinden değil, aşağıdaki kritik faktörler üzerinden analiz etmek:
-
-*   **⏱️ Hız:** Düşünme (Thinking) ve Kodlama (Writing) süreleri.
-*   **🏛️ Mimari Kalite:** OOP kullanımı, fonksiyonel yapı, temiz kod prensipleri.
-*   **🛡️ Güvenlik ve Standartlar:** McCabe karmaşıklığı, PEP8 uyumu, güvenlik açıkları.
-*   **🖥️ Kaynak Verimliliği:** CPU ve RAM tüketimi (On-Premise modunda).
+Designed for local, on-premise benchmarking with **zero network latency** and **highest precision**.
 
 ---
 
-## 🚀 Özellikler (v2.2-local)
+## 🌟 Neden VibeBench?
 
-*   **🏠 Tam Lokal Çalışma (On-Premise):** Tüm süreç yerel disk üzerinde, ağ gecikmesi olmadan çalışır.
-*   **⏱️ Hassas Zamanlama:** `perf_counter` ile milisaniye hassasiyetinde ölçüm.
-*   **👀 Watchdog Entegrasyonu:** Dosya sistemi değişikliklerini anlık yakalar.
-*   **🖥️ Kaynak Takibi:** `psutil` ile CPU ve RAM kullanımını anlık raporlar.
-*   ** Canlı Dashboard:** Terminal üzerinden tüm sürecin canlı takibi.
-*   **�️ LocalErrorLogger:** Windows I/O hatalarını (izin, kilit, path uzunluğu) yönetir.
+Geleneksel kodlama benchmarkları genellikle sadece "kod çalışıyor mu?" sorusuna odaklanır. VibeBench ise yapay zekanın **nasıl düşündüğünü** ve **nasıl kodladığını** derinlemesine analiz eder.
+
+### Temel Felsefe:
+1.  **Gerçek Zamanlılık:** AI'nın düşünme süresi ile kod yazma süresini milisaniye hassasiyetinde ayırır.
+2.  **Lokal On-Premise:** Ağ gecikmelerini elimine eder. Tüm süreç yerel disk ve CPU/RAM üzerinde döner.
+3.  **Çok Boyutlu Analiz:** Sadece hız değil; mimari kalite, temiz kod prensipleri ve kaynak verimliliği de puanlanır.
+
+---
+
+## 🏗️ Mimari ve Teknoloji (v2.2-local)
+
+VibeBench v2.2, tamamen lokalize edilmiş bir motor kullanır:
+
+*   **⏱️ Ms Hassasiyetinde Zamanlama (`perf_counter`):**
+    *   Python'un en hassas zaman sayacı `time.perf_counter()` kullanılır.
+    *   **Watchdog Polling:** Dosya sistemi değişiklikleri her **100ms**'de bir taranır (`SIGNAL_POLL_INTERVAL_MS`).
+    *   Bu sayede AI'nın reaksiyon süresi (thinking time) hatasız ölçülür.
+
+*   **🖥️ Anlık Kaynak Takibi (`psutil`):**
+    *   Arka planda çalışan bir **Daemon Thread**, her **1.0 saniyede** bir sistem kaynaklarını örnekler.
+    *   **CPU:** Anlık yük yüzdesi.
+    *   **RAM:** Kullanılan bellek miktarı (MB).
+    *   Bu veriler final skora etki etmese de raporlarda sunulur.
+
+*   **🛡️ LocalErrorLogger (Dayanıklılık):**
+    *   Windows dosya sistemi kısıtlamalarına (260 karakter, dosya kilitleme, izin sorunları) karşı özel bir koruma katmanı.
+    *   Tüm I/O işlemleri `safe_write` wrapper'ı ile korunur.
+    *   Hatalar `logs/local_errors.json` dosyasına ayrıntılı olarak işlenir.
 
 ---
 
 ## 📦 Kurulum
 
-```powershell
-# Projeyi klonlayın
-git clone https://github.com/MuratBrls/Vibecodingbenchmark.git
-cd Vibecodingbenchmark
+### Gereksinimler
+*   Python 3.8 veya üzeri
+*   Windows, Linux veya macOS (Windows önerilir)
 
-# Gerekli kütüphaneleri yükleyin
-pip install -r requirements.txt
-```
+### Adımlar
 
-*(Gereksinimler: Python 3.8+, `psutil>=5.9.0`, `watchdog`, `rich`, `pycodestyle`, `mccabe`)*
+1.  **Projeyi Klonlayın:**
+    ```powershell
+    git clone https://github.com/MuratBrls/Vibecodingbenchmark.git
+    cd Vibecodingbenchmark
+    ```
+
+2.  **Sanal Ortam (Opsiyonel ama Önerilir):**
+    ```powershell
+    python -m venv venv
+    .\venv\Scripts\activate
+    ```
+
+3.  **Bağımlılıkları Yükleyin:**
+    ```powershell
+    pip install -r requirements.txt
+    ```
+    *(Temel paketler: `psutil`, `watchdog`, `rich`, `mccabe`, `pycodestyle`)*
 
 ---
 
 ## 🎮 Kullanım
 
-### Benchmark Başlatma
+### 1. Benchmark Başlatma (RUN)
+En temel kullanım. Sisteme bir prompt verirsiniz ve izleme başlar.
 
 ```powershell
-python main.py run "Prompt metni buraya" --timeout 600
+python main.py run "Bana OOP tabanlı bir hesap makinesi yap, loglama da olsun."
 ```
 
-*   **Prompt:** AI modellerine dağıtılacak görev metni.
-*   **--no-clean:** Eski çıktıları silmeden çalıştırır.
-*   **--timeout N:** Zaman aşımı süresi (varsayılan: 600sn).
+**Seçenekler:**
+*   `--no-clean`: Önceki test dosyalarını silmeden çalıştırır. (Debug için yararlıdır)
+*   `--timeout N`: Varsayılan 600 saniye olan zaman aşımını değiştirir.
 
-### Durum Kontrolü
+### 2. Durum Kontrolü (STATUS)
+Mevcut çalışan agent'ların durumunu, son raporu ve kaynak kullanımını gösterir.
 
 ```powershell
 python main.py status
@@ -63,38 +93,92 @@ python main.py status
 
 ---
 
-## 📋 AI Protokolü
+## 🤖 Vibe Protokolü (AI Agent'lar İçin)
 
-Benchmark'a katılan her AI şu protokolü uygulamalıdır:
+Benchmark'a katılan her AI (Cursor, Windsurf, Antigravity vb.) aşağıdaki akışı **kesinlikle** uygulamalıdır:
 
-1.  **Start Sinyali:** Çalışma klasörüne `start_signal.json` oluştur. *(Bu, "Düşünme"yi bitirir, "Yazma"yı başlatır)*
-2.  **Kodlama:** İstenen kodu yaz ve kaydet. *(Bu, "Yazma" süresini belirler)*
-3.  **End Sinyali:** İşlem bitince `start_signal.json` dosyasını sil. *(Bu, görevi tamamlar)*
+1.  **🚀 BAŞLANGIÇ (Sinyal):**
+    *   Çalışma klasörüne (`test-bench*`) `start_signal.json` adında boş bir dosya oluşturur.
+    *   *Bu an, "Thinking Time"ın bittiği ve "Writing Time"ın başladığı andır.*
+
+2.  **code KODLAMA:**
+    *   İstenen kod dosyasını (örn: `calculator.py`) yazar ve kaydeder.
+    *   *Dosyanın diske yazıldığı an "Writing Time" olarak kaydedilir.*
+
+3.  **🏁 BİTİŞ (Sinyal):**
+    *   İşlem tamamlanınca `start_signal.json` dosyasını siler.
+    *   *Bu, görevin başarıyla tamamlandığını sisteme bildirir.*
 
 ---
 
 ## 📊 Puanlama Sistemi (Total Score)
 
-| Metrik | Ağırlık | Açıklama |
-| :--- | :---: | :--- |
-| **⏱️ Hız** | **30%** | Toplam süre (Düşünme + Yazma). |
-| **🏛️ Mimari** | **30%** | Yapısal analiz, McCabe skoru, Temiz Kod. |
-| **❌ Hata** | **25%** | Her hata veya retry girişimi puan siler. |
-| **💎 Kütüphane** | **15%** | Gereksiz import kullanımı cezalandırılır. |
+VibeBench, 4 ana kategoride puanlama yapar. Toplam Puan 100 üzerinden hesaplanır.
+
+### 1. ⏱️ Hız (Ağırlık: %30)
+*   **Thinking Time:** Sinyal dosyası oluşana kadar geçen süre.
+*   **Writing Time:** Kodun diske yazılmasına kadar geçen süre.
+*   *Daha hızlı olan daha yüksek puan alır.*
+
+### 2. 🏛️ Mimari & Kalite (Ağırlık: %30)
+*   **Mimari Tipi:**
+    *   `OOP` (Sınıf tabanlı) -> **100 Puan**
+    *   `Functional` (Fonksiyonel) -> **80 Puan**
+    *   `Scripting` (Düz kod) -> **40 Puan**
+*   **McCabe Karmaşıklığı:** Kodun okunabilirliği ve bakımı (düşük olması iyidir).
+*   **PEP8 Uyumu:** Python standartlarına uygunluk.
+*   **Temiz Kod:** Fonksiyon/Sınıf oranları, docstring kullanımı.
+
+### 3. ❌ Hata & Dayanıklılık (Ağırlık: %25)
+*   **Syntax/Runtime Hatası:** Kodu çalıştırılamazsa 0 puan.
+*   **Hata Oranı:** Her `SyntaxError` veya çalışma zamanı hatası **-10 puan** ceza getirir.
+*   **Retry Sayısı:** AI kodu kaç kere düzeltip tekrar denedi? Her deneme puan düşürür.
+
+### 4. 💎 Kütüphane Verimliliği (Ağırlık: %15)
+*   **Gereksiz Import:** Kullanılmayan kütüphaneler puan düşürür.
+*   **Standart Kütüphane:** Harici bağımlılık yerine standart kütüphane (os, sys, math) kullanımı teşvik edilir.
 
 ---
 
-## 📁 Dizin Yapısı
+## 📁 Proje Yapısı
 
-*   `main.py`: Ana CLI uygulaması.
-*   `watcher.py`: Dosya izleme ve zamanlama motoru.
-*   `telemetry.py`: Kaynak ve işlem takibi.
-*   `scorer.py`: Puanlama motoru.
-*   `dashboard.py`: Terminal arayüzü.
-*   `local_error_logger.py`: Hata yönetimi.
-*   `logs/`: JSON ve HTML raporları.
-*   `test-bench*`: AI çalışma alanları.
+```
+VibeCodingBenchmark/
+├── main.py                # 🚀 CLI Giriş Noktası
+├── config.py              # ⚙️ Ayarlar (Dizinler, Timeout, Polling)
+├── watcher.py             # 👀 Dosya İzleme Motoru (Watchdog)
+├── telemetry.py           # 📊 Kaynak Takibi (psutil)
+├── scorer.py              # 🧮 Puanlama Algoritması
+├── dashboard.py           # 🖥️ Terminal Arayüzü (Rich)
+├── bench_logger.py        # 📝 Raporlama (JSON/HTML)
+├── local_error_logger.py  # 🛡️ Hata Yönetimi
+├── requirements.txt       # 📦 Bağımlılıklar
+├── logs/                  # 📂 Rapor Çıktıları
+└── test-bench*/           # 📂 AI Çalışma Alanları
+```
 
 ---
 
-*© 2026 Black Box Deep Analytics*
+## 🛡️ Sorun Giderme (Troubleshooting)
+
+*   **`PermissionError` Hatası:**
+    *   Yönetici olarak çalıştırmayı deneyin.
+    *   Antivirüs yazılımının dosya oluşturmayı engellemediğinden emin olun.
+*   **`AttributeError: Observer object has no attribute 'timeout'`:**
+    *   `watchdog` kütüphanesinin sürümüyle ilgili bir uyumsuzluk olabilir. `pip install --upgrade watchdog` yapın. (v2.2-local bu sorunu `observer = Observer(timeout=...)` ile çözmüştür).
+*   **RAM/CPU Verileri Gelmiyor:**
+    *   `psutil` kütüphanesinin yüklü olduğundan emin olun (`pip show psutil`).
+
+---
+
+## 🤝 Katkıda Bulunma
+
+1.  Bu repoyu fork edin.
+2.  Yeni bir feature branch oluşturun (`git checkout -b feature/yenilik`).
+3.  Değişikliklerinizi commit edin (`git commit -m 'Yeni özellik eklendi'`).
+4.  Branch'inizi push edin (`git push origin feature/yenilik`).
+5.  Bir Pull Request oluşturun.
+
+---
+
+*v2.2-local © 2026 Black Box Deep Analytics*
